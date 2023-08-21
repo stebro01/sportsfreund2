@@ -16,8 +16,8 @@
       </div>
 
       <!-- CIRCLE -->
-      <div class="col-auto">
-        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_VALUE" size="120px" :thickness="0.2" color="green-4"
+      <div class="col-7">
+        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_VALUE" size="150px" :thickness="0.2" color="green-4"
           :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
           <div>
             <div>{{ time - value }}
@@ -32,10 +32,10 @@
       </div>
       <div class="col-1">
         <div class="row justify-center q-gutter-md" v-if="interval === undefined">
-          <q-btn color="positive" @click="addTime(5)" round>+5</q-btn>
-          <q-btn color="positive" @click="addTime(1)" round>+1</q-btn>
-          <q-btn color="negative" @click="addTime(-1)" round>-1</q-btn>
-          <q-btn color="negative" @click="addTime(-5)" round>-5</q-btn>
+          <q-btn class="my-decent-text" color="positive" @click="addTime(5)" round>+5</q-btn>
+          <q-btn class="my-decent-text" color="positive" @click="addTime(1)" round>+1</q-btn>
+          <q-btn class="my-decent-text" color="negative" @click="addTime(-1)" round>-1</q-btn>
+          <q-btn class="my-decent-text" color="negative" @click="addTime(-5)" round>-5</q-btn>
         </div>
       </div>
 
