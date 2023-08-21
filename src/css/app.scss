@@ -1,1 +1,40 @@
 // app global css in SCSS form
+h1,
+.text-h1 {
+  font-size: 2em;
+}
+
+h2,
+.text-h2 {
+  font-size: 1.8em;
+}
+
+h3,
+.text-h3 {
+  font-size: 1.7em;
+}
+
+h4,
+.text-h4 {
+  font-size: 1.5em;
+}
+
+h5,
+h6,
+.text-h5,
+.text-h6 {
+  font-size: 1.3em;
+}
+
+body {
+  background-color: $dark;
+  color: $light;
+}
+
+.my-decent-text {
+  color: $decent;
+}
+
+.my-decent-bg {
+  background-color: $decent;
+}

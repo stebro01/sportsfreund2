@@ -1,22 +1,16 @@
 <template>
-  <q-item
-    clickable
-    tag="a"
-    target="_blank"
-    :href="link"
-  >
-    <q-item-section
-      v-if="icon"
-      avatar
-    >
-      <q-icon :name="icon" />
+  <q-item v-if="el.seperator !== true" clickable @click="$router.push({ name: el.route })"
+    :disable="$route.name === el.route">
+    <q-item-section v-if="el.icon" avatar>
+      <q-icon :name="el.icon" />
     </q-item-section>
 
     <q-item-section>
-      <q-item-label>{{ title }}</q-item-label>
-      <q-item-label caption>{{ caption }}</q-item-label>
+      <q-item-label>{{ el.titel }}</q-item-label>
+      <q-item-label caption class="my-decent-text">{{ el.caption }}</q-item-label>
     </q-item-section>
   </q-item>
+  <q-separator v-else class="q-ma-lg my-decent-bg" style="opacity: 0.5" />
 </template>
 
 <script>
@@ -24,26 +18,7 @@ import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'EssentialLink',
-  props: {
-    title: {
-      type: String,
-      required: true
-    },
+  props: ["el"]
 
-    caption: {
-      type: String,
-      default: ''
-    },
-
-    link: {
-      type: String,
-      default: '#'
-    },
-
-    icon: {
-      type: String,
-      default: ''
-    }
-  }
 })
 </script>
