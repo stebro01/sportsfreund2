@@ -12,6 +12,18 @@ const routes = [
     ]
   },
 
+  // Timer
+  {
+    path: '/timer',
+    name: 'Timer',
+    component: () => import('src/layouts/TimerLayout.vue'),
+    children: [
+      { path: 'timer', name: 'QuickTimer', components: { 'timer': () => import('pages/Timer/QuickTimer.vue') } },
+      { path: 'program', name: 'ProgramTimer', components: { 'timer': () => import('pages/Timer/ProgrammTimer.vue') } },
+      { path: 'friends', name: 'InviteFriends', components: { 'timer': () => import('pages/Timer/InviteFriends.vue') } }
+    ]
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

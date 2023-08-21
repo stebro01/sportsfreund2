@@ -1,5 +1,5 @@
 <template>
-  <q-page data-cy="page_about" class="page-size">
+  <q-page data-cy="page_about" class="page-size no-pointer-events non-selectable">
 
     <div class="column items-center q-px-xl">
       <div class="col">

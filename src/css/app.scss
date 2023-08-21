@@ -35,6 +35,17 @@ body {
   color: $decent;
 }
 
+.my-small-text {
+  font-size: 0.3em;
+}
+
 .my-decent-bg {
   background-color: $decent;
+}
+
+.my-main-btn {
+  background-color: $primary;
+  opacity: 0.9;
+  width: 220px;
+  font-size: 1.2em;
 }
