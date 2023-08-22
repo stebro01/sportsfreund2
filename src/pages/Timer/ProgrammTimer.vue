@@ -23,7 +23,7 @@
       </div>
 
       <!-- OPTIONS -->
-      <div class="col row justify-center">
+      <div v-if="interval === undefined" class="col row justify-center">
         <!-- STEUER ELEMENTE -->
         <q-list class="" style="max-width: 400px; min-width: 350px">
           <!-- SELECTION / PREVIOUS -->
@@ -134,6 +134,17 @@
 
       </div>
 
+      <!-- TIMER -->
+      <div v-else class="col-2">
+        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_VALUE" size="150px" :thickness="0.2" color="green-4"
+          :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
+
+
+        </q-knob>
+
+
+
+      </div>
 
       <!-- ENDE COL -->
     </div>
@@ -152,10 +163,10 @@ export default {
       interval: undefined,
       timer_finished: false,
       localData: {
-        action: { value: 40, unit: 's' },
-        break: { value: 10, unit: 's' },
-        exercises: { value: 10, unit: 'x' },
-        rounds: { value: 4, unit: 'x' },
+        action: { value: 10, unit: 's' },
+        break: { value: 5, unit: 's' },
+        exercises: { value: 4, unit: 'x' },
+        rounds: { value: 5, unit: 'x' },
         round_break: { value: 20, unit: 's' },
         label: 'Tabata'
       },
@@ -205,7 +216,10 @@ export default {
 
     calcDuration(data) {
       const { action, break: _break, exercises, rounds, round_break } = data
-      const total = (action.value + _break.value) * exercises.value * rounds.value + round_break.value * rounds.value
+      var total = (action.value + _break.value) * exercises.value * rounds.value + round_break.value * rounds.value
+      // substract last break and round_break
+      total -= _break.value + round_break.value
+
       return total
     },
 
@@ -228,11 +242,26 @@ export default {
 
     // TIMER
     startTimer() {
+      this.interval = true
+      this.timer_finished = false
 
+      //prepare an array with the times
+      const times = []
+      for (let round_i = 0; round_i < this.localData.rounds.value; round_i++) {
+        for (let i = 0; i < this.localData.exercises.value; i++) {
+          times.push({ type: 'action', value: this.localData.action.value, ind: i, round_ind: round_i })
+          times.push({ type: 'break', value: this.localData.break.value, ind: i, round_ind: round_i })
+        }
+        if (round_i < this.localData.rounds.value - 1) times.push({ type: 'round_break', value: this.localData.round_break.value, ind: 0, round_ind: round_i })
+      }
+      // remove last element, because it is a break
+      times.pop()
+
+      console.log(times)
     },
 
     stopTimer() {
-
+      this.interval = undefined
     },
 
 
