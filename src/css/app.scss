@@ -51,3 +51,21 @@ body {
   // rounded corners
   border-radius: 10px;
 }
+
+.my-action-item {
+  background-color: rgba(0, 128, 0, 0.09);
+  color: $positive;
+}
+
+.my-pause-item {
+  background-color: rgba(255, 0, 0, 0.08);
+  color: $negative;
+}
+
+.my-popup-card {
+  height: 150px;
+  min-width: 350px;
+  width: 300px;
+  background-color: $dark;
+  color: $light;
+}
