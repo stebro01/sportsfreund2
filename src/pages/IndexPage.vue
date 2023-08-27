@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <q-img alt="Quasar logo" src="~assets/arni_logo.png" height="300px" />
+    <q-img alt="Quasar logo" src="~assets/arni_logo.png" height="60vh" />
 
     <div class="absolute-center row q-gutter-lg justify-center">
       <q-btn no-caps class="my-main-btn" @click="$router.push({ name: 'QuickTimer' })">Starte Timer</q-btn>

@@ -1,0 +1,27 @@
+{
+  "name": "sportsfreunde2.app",
+  "displayName": "sportsfreunde2",
+  "version": "1.0.0",
+  "description": "sportsfreunde2 App - powered by Apache Cordova",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecosystem:cordova"
+  ],
+  "author": "Apache Cordova Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cordova-ios": "^7.0.0",
+    "cordova-plugin-splashscreen": "^6.0.2"
+  },
+  "cordova": {
+    "platforms": [
+      "ios"
+    ],
+    "plugins": {
+      "cordova-plugin-splashscreen": {}
+    }
+  }
+}
