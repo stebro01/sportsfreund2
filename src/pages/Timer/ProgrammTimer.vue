@@ -50,8 +50,8 @@
             </q-item-section>
             <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
                 @click="saveNewPreset()" color="white"></q-btn></q-item-section>
-            <q-item-section side v-else><q-btn flat icon="delete" @click="removePreset(this.localData.label)"
-                color="grey-5"></q-btn></q-item-section>
+            <q-item-section side v-else-if="localData.label !== label_new_preset && localData.label !== 'Default'"><q-btn
+                flat icon="delete" @click="removePreset(this.localData.label)" color="grey-5"></q-btn></q-item-section>
           </q-item>
 
           <!-- Action -->
