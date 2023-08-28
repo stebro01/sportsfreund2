@@ -94,7 +94,7 @@ export default {
       // value is the actual value of the timer
       // time is the time in seconds
       // timeLeft is the time left in seconds
-      this.playSound()
+      this.playSound('gong')
       this.timer_finished = false
       let timeLeft = this.time
       this.value = 0
@@ -104,7 +104,7 @@ export default {
         timeLeft = timeLeft - 1
         this.value = value
         if (timeLeft <= 0) {
-          this.playSound()
+          this.playSound('gong')
           clearInterval(this.interval)
           this.interval = undefined
           this.value = 0
@@ -123,10 +123,28 @@ export default {
     },
 
     // PLAY SOUND FILE
-    playSound() {
+    playSound(item) {
       if (!this.$store.getters.SETTINGS.audio_playback) return
-      var audio = new Audio(require('assets/sounds/gong.wav'))
-      audio.play()
+      if (this.$q.platform.is.cordova) {
+        var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
+
+        var myMedia = new Media(path,
+          function () {
+            console.log("Audio Success");
+          },
+          function (err) {
+            console.log("Audio Error: " + err.code);
+          }
+        );
+
+
+        myMedia.play()
+        return
+      } else {
+        var audio = new Audio(require(`assets/sounds/${item}.wav`))
+        audio.play({ playAudioWhenScreenIsLocked: true })
+        return
+      }
     }
 
 

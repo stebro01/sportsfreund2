@@ -10,7 +10,6 @@ const template_presets = [
 ]
 var presets = localStorage.getItem('presets')
 if (presets !== null) presets = JSON.parse(presets)
-console.log(presets)
 
 export default function () {
   return {

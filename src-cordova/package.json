@@ -14,6 +14,8 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "cordova-ios": "^7.0.0",
+    "cordova-plugin-file": "^7.0.0",
+    "cordova-plugin-media": "^6.1.0",
     "cordova-plugin-splashscreen": "^6.0.2"
   },
   "cordova": {
@@ -21,7 +23,10 @@
       "ios"
     ],
     "plugins": {
-      "cordova-plugin-splashscreen": {}
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-media": {
+        "KEEP_AVAUDIOSESSION_ALWAYS_ACTIVE": "NO"
+      }
     }
   }
 }

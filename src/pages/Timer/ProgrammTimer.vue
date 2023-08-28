@@ -509,8 +509,26 @@ export default {
     // SOUNDS
     playSound(item) {
       if (!this.$store.getters.SETTINGS.audio_playback) return
-      var audio = new Audio(require(`assets/sounds/${item}.wav`))
-      audio.play()
+      if (this.$q.platform.is.cordova) {
+        var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
+
+        var myMedia = new Media(path,
+          function () {
+            console.log("Audio Success");
+          },
+          function (err) {
+            console.log("Audio Error: " + err.code);
+          }
+        );
+
+
+        myMedia.play()
+        return
+      } else {
+        var audio = new Audio(require(`assets/sounds/${item}.wav`))
+        audio.play({ playAudioWhenScreenIsLocked: true })
+        return
+      }
     },
 
     // SOME HELPER
