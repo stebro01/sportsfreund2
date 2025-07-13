@@ -54,7 +54,7 @@ export default {
     return {
       toggleLeftDrawer: false,
       leftDrawerOpen: false,
-      essentialLinks: this.store.essentialLinks
+      essentialLinks: this.store.getEssentialLinks
     }
   },
   computed: {
