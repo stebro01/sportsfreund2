@@ -100,6 +100,9 @@ export const useAppStore = defineStore('app', {
           ...this.PROGRAM_STEPS[index],
           ...partial
         }
+      },
+      log(payload) {
+        console.log(payload)
       }
   }
 })
