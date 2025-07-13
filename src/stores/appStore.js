@@ -56,7 +56,7 @@ export const useAppStore = defineStore('app', {
     }
   },
   getters: {
-    essentialLinks: state => state.essentialLinks,
+    getEssentialLinks: state => state.essentialLinks,
     env: state => state.ENV,
     settings: state => state.SETTINGS,
     lastPreset: state => state.LAST_PRESET || defaultPreset,
