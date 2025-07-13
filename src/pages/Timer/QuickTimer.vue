@@ -1,9 +1,9 @@
 <template>
   <q-page data-cy="page_about" class="full-height">
     <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
-    <q-btn :icon="!$store.getters.SETTINGS.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+    <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
       class="absolute-top-left"
-      @click="$store.commit('SET_SETTINGS_AUDIO_PLAYBACK', !$store.getters.SETTINGS.audio_playback)" />
+      @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     <div class="column text-center" style="height: 100vh; width: 100vw">
       <div class="col-1">QuickTimer</div>
       <!-- TIMER ELEMENT -->
@@ -46,14 +46,19 @@
 </template>
 
 <script>
+import { useAppStore } from 'stores/appStore'
 export default {
   name: 'QuickTimer',
   components: {
 
   },
+  setup () {
+    const store = useAppStore()
+    return { store }
+  },
   data() {
     return {
-      time: this.$store.getters.SETTINGS.quick_timer_start_value,
+      time: this.store.settings.quick_timer_start_value,
       value: 0,
       interval: undefined,
       timer_finished: false
@@ -84,7 +89,7 @@ export default {
       this.timer_finished = false
       this.time = this.time + value
       if (this.time <= 0) {
-        this.time = this.$store.getters.SETTINGS.quick_timer_start_value
+        this.time = this.store.settings.quick_timer_start_value
       }
 
     },
@@ -109,7 +114,7 @@ export default {
           this.interval = undefined
           this.value = 0
           this.timer_finished = true
-          this.$store.commit('SET_SETTINGS_QUICK_TIMER_START_VALUE', this.time)
+          this.store.setSettingsQuickTimerStartValue(this.time)
         }
       }, 1000)
 
@@ -124,7 +129,7 @@ export default {
 
     // PLAY SOUND FILE
     playSound(item) {
-      if (!this.$store.getters.SETTINGS.audio_playback) return
+      if (!this.store.settings.audio_playback) return
       if (this.$q.platform.is.cordova) {
         var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
 

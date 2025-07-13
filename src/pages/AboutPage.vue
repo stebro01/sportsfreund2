@@ -17,15 +17,20 @@
 <script>
 import showdown from "showdown"
 import MD_TEXT from 'raw-loader!../../ABOUT.md'
+import { useAppStore } from 'stores/appStore'
 
 export default {
   name: 'AboutPage',
   components: {
 
   },
+  setup () {
+    const store = useAppStore()
+    return { store }
+  },
   data() {
     return {
-      TEXT: this.$store.state.TEXT
+      TEXT: this.store.TEXT
     }
   },
   mounted() {
