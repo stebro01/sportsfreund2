@@ -47,10 +47,7 @@
 
 <script>
 import { useAppStore } from 'stores/appStore'
-import createSoundMap from 'src/tools/soundMap.js'
-import gong from 'assets/sounds/gong.wav'
-
-const soundMap = createSoundMap({ gong })
+import playSound from 'src/tools/sound.js'
 export default {
   name: 'QuickTimer',
   components: {
@@ -103,7 +100,7 @@ export default {
       // value is the actual value of the timer
       // time is the time in seconds
       // timeLeft is the time left in seconds
-      this.playSound('gong')
+      playSound('gong', this.store.settings.audio_playback)
       this.timer_finished = false
       let timeLeft = this.time
       this.value = 0
@@ -113,7 +110,7 @@ export default {
         timeLeft = timeLeft - 1
         this.value = value
         if (timeLeft <= 0) {
-          this.playSound('gong')
+          playSound('gong', this.store.settings.audio_playback)
           clearInterval(this.interval)
           this.interval = undefined
           this.value = 0
@@ -129,31 +126,6 @@ export default {
       this.interval = undefined
       this.value = 0
       this.timer_finished = false
-    },
-
-    // PLAY SOUND FILE
-    playSound(item) {
-      if (!this.store.settings.audio_playback) return
-      if (this.$q.platform.is.cordova) {
-        var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
-
-        var myMedia = new Media(path,
-          function () {
-            console.log("Audio Success");
-          },
-          function (err) {
-            console.log("Audio Error: " + err.code);
-          }
-        );
-
-
-        myMedia.play()
-        return
-      } else {
-        var audio = new Audio(soundMap[item])
-        audio.play({ playAudioWhenScreenIsLocked: true })
-        return
-      }
     }
 
 

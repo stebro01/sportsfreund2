@@ -198,12 +198,7 @@
 import MY_ITEM_BTN from 'components/MyItemBtn.vue'
 import getRandomCitation from 'src/tools/citate.js'
 import { useAppStore } from 'stores/appStore'
-import createSoundMap from 'src/tools/soundMap.js'
-import beepbeepbeep_1s from 'assets/sounds/beepbeepbeep_1s.wav'
-import beep_1s from 'assets/sounds/beep_1s.wav'
-import tada from 'assets/sounds/tada.wav'
-
-const soundMap = createSoundMap({ beepbeepbeep_1s, beep_1s, tada })
+import playSound from 'src/tools/sound.js'
 
 export default {
   name: 'ProgrammTimer',
@@ -430,7 +425,7 @@ export default {
       this.TIME_DATA = this._prepareTimer() // prepare an array with the times
       this.interval = true
       // COUNT DOWN 1s
-      this.playSound('beepbeepbeep_1s')
+      playSound('beepbeepbeep_1s', this.store.settings.audio_playback)
       await this.delay(1500)
 
       this.store.setLastPreset(JSON.parse(JSON.stringify(this.localData)))
@@ -450,7 +445,7 @@ export default {
       if (this.TIME_IND === -1) {
         this.timer_finished = true
         this.value = 0
-        this.playSound('tada')
+        playSound('tada', this.store.settings.audio_playback)
         return
       } // else
 
@@ -460,7 +455,7 @@ export default {
       // now start the intervall with ticks of 1s
       this.interval = setInterval(() => {
         // check if timer is finished
-        if (this.value + 1 === nextTimer.value) this.playSound('beep_1s')
+        if (this.value + 1 === nextTimer.value) playSound('beep_1s', this.store.settings.audio_playback)
         if (this.value >= nextTimer.value) {
 
           // set _check to true
@@ -517,30 +512,6 @@ export default {
     },
 
 
-    // SOUNDS
-    playSound(item) {
-      if (!this.store.settings.audio_playback) return
-      if (this.$q.platform.is.cordova) {
-        var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
-
-        var myMedia = new Media(path,
-          function () {
-            console.log("Audio Success");
-          },
-          function (err) {
-            console.log("Audio Error: " + err.code);
-          }
-        );
-
-
-        myMedia.play()
-        return
-      } else {
-        var audio = new Audio(soundMap[item])
-        audio.play({ playAudioWhenScreenIsLocked: true })
-        return
-      }
-    },
 
     // SOME HELPER
 
