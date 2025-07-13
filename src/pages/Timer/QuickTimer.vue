@@ -16,7 +16,7 @@
       </div>
 
       <!-- CIRCLE -->
-      <div class="col-7">
+      <div class="col-7 row justify-center items-center">
         <q-knob show-value class="text-white q-ma-md timer-knob" v-model="TIMER_VALUE" size="180px" :thickness="0.2" color="green-4"
           :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
           <div>
