@@ -110,10 +110,13 @@ export const useAppStore = defineStore('app', {
         window.localStorage.setItem('recent_timers', JSON.stringify(this.RECENT_TIMERS))
       },
       pinTimer(duration) {
-        if (!this.PINNED_TIMERS.includes(duration)) {
-          this.PINNED_TIMERS.push(duration)
-          window.localStorage.setItem('pinned_timers', JSON.stringify(this.PINNED_TIMERS))
+        const existingIndex = this.PINNED_TIMERS.indexOf(duration)
+        if (existingIndex !== -1) {
+          this.PINNED_TIMERS.splice(existingIndex, 1)
         }
+        this.PINNED_TIMERS.unshift(duration)
+        this.PINNED_TIMERS = this.PINNED_TIMERS.slice(0, 3)
+        window.localStorage.setItem('pinned_timers', JSON.stringify(this.PINNED_TIMERS))
       },
       unpinTimer(duration) {
         this.PINNED_TIMERS = this.PINNED_TIMERS.filter(t => t !== duration)

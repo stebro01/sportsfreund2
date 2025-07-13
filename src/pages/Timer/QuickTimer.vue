@@ -98,44 +98,34 @@
           >
         </div>
       </div>
-      <div class="col-2">
-        <div
-          class="row justify-center q-gutter-sm"
-          v-if="store.pinnedTimers.length"
-        >
-          <q-chip
-            v-for="t in store.pinnedTimers"
-            :key="'p' + t"
-            class="pinned-chip"
-            clickable
-            removable
-            @click="selectTime(t)"
-            @remove="unpinTimer(t)"
-          >
-            {{ t }}s
-          </q-chip>
-        </div>
-        <div
-          class="row justify-center q-gutter-sm"
-          v-if="store.recentTimers.length"
-        >
-          <q-chip
-            v-for="t in store.recentTimers"
-            :key="'r' + t"
-            class="recent-chip"
-            clickable
-            @click="selectTime(t)"
-          >
-            {{ t }}s
-            <q-icon
-              name="push_pin"
-              size="xs"
-              class="q-ml-xs"
-              @click.stop="pinTimer(t)"
-            />
-          </q-chip>
-        </div>
-      </div>
+      <div class="col-2"></div>
+    </div>
+    <div
+      class="bottom-container fixed-bottom row justify-center items-center q-gutter-sm q-pa-sm"
+      v-if="store.pinnedTimers.length || store.recentTimers.length"
+    >
+      <q-btn
+        v-for="t in store.pinnedTimers"
+        :key="'p' + t"
+        round
+        size="sm"
+        color="amber-7"
+        class="q-mx-xs"
+        @click="selectTime(t)"
+      >
+        {{ t }}s
+      </q-btn>
+      <q-btn
+        v-for="t in store.recentTimers"
+        :key="'r' + t"
+        round
+        size="sm"
+        color="grey-6"
+        class="q-mx-xs"
+        @click="selectTime(t)"
+      >
+        {{ t }}s
+      </q-btn>
     </div>
   </q-page>
 </template>
@@ -243,14 +233,7 @@ export default {
   box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
   border-radius: 50%;
 }
-.pinned-chip {
-  background-color: #ffc107;
-  color: #000;
-  font-size: 1.1rem;
-  padding: 4px 8px;
-}
-.recent-chip {
-  background-color: #555;
-  color: #fff;
+.bottom-container {
+  background: rgba(0, 0, 0, 0.4);
 }
 </style>
