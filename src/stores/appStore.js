@@ -33,12 +33,23 @@ export const useAppStore = defineStore('app', {
       presets = null
     }
 
+    let recentTimers
+    try {
+      const rawRecent = localStorage.getItem('recent_timers')
+      if (rawRecent !== null) recentTimers = JSON.parse(rawRecent)
+    } catch (e) {
+      recentTimers = []
+    }
+
+    let pinnedTimers
+    try {
+      const rawPinned = localStorage.getItem('pinned_timers')
+      if (rawPinned !== null) pinnedTimers = JSON.parse(rawPinned)
+    } catch (e) {
+      pinnedTimers = []
+    }
+
     return {
-      ENV: {
-        APP_URL: 'http://localhost:3000',
-        APP_VERSION: 'v202308',
-        APP_NAME: 'Sportfreunde 2.0'
-      },
       SETTINGS: {
         audio_playback: true,
         quick_timer_start_value: 20 // in seconds
@@ -46,6 +57,8 @@ export const useAppStore = defineStore('app', {
       LAST_PRESET: lastPreset || undefined,
       PRESETS: presets || templatePresets,
       PROGRAM_STEPS: [],
+      RECENT_TIMERS: recentTimers || [],
+      PINNED_TIMERS: pinnedTimers || [],
       essentialLinks: [
         { titel: 'Home', caption: 'zurück', icon: 'home', route: 'Index' },
         { seperator: true },
@@ -57,11 +70,17 @@ export const useAppStore = defineStore('app', {
   },
   getters: {
     getEssentialLinks: state => state.essentialLinks,
-    env: state => state.ENV,
+    env: () => ({
+      APP_URL: process.env.APP_URL,
+      APP_VERSION: process.env.APP_VERSION,
+      APP_NAME: process.env.APP_NAME
+    }),
     settings: state => state.SETTINGS,
     lastPreset: state => state.LAST_PRESET || defaultPreset,
     presets: state => state.PRESETS,
-    programSteps: state => state.PROGRAM_STEPS
+    programSteps: state => state.PROGRAM_STEPS,
+    recentTimers: state => state.RECENT_TIMERS,
+    pinnedTimers: state => state.PINNED_TIMERS
   },
     actions: {
       setSettingsAudioPlayback(payload) {
@@ -84,6 +103,21 @@ export const useAppStore = defineStore('app', {
         console.log({ message: 'REMOVE_PRESET' })
         this.PRESETS = this.PRESETS.filter(preset => preset.label !== label)
         window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
+      },
+      addRecentTimer(duration) {
+        this.RECENT_TIMERS.unshift(duration)
+        this.RECENT_TIMERS = this.RECENT_TIMERS.slice(0, 3)
+        window.localStorage.setItem('recent_timers', JSON.stringify(this.RECENT_TIMERS))
+      },
+      pinTimer(duration) {
+        if (!this.PINNED_TIMERS.includes(duration)) {
+          this.PINNED_TIMERS.push(duration)
+          window.localStorage.setItem('pinned_timers', JSON.stringify(this.PINNED_TIMERS))
+        }
+      },
+      unpinTimer(duration) {
+        this.PINNED_TIMERS = this.PINNED_TIMERS.filter(t => t !== duration)
+        window.localStorage.setItem('pinned_timers', JSON.stringify(this.PINNED_TIMERS))
       },
       addProgramStep(step) {
         this.PROGRAM_STEPS.push(step)
