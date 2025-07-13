@@ -40,9 +40,16 @@
       </div>
       <div class="col-2">
         <div class="row justify-center q-gutter-sm" v-if="store.pinnedTimers.length">
-          <q-chip v-for="t in store.pinnedTimers" :key="'p'+t" class="pinned-chip" clickable @click="selectTime(t)">
+          <q-chip
+            v-for="t in store.pinnedTimers"
+            :key="'p'+t"
+            class="pinned-chip"
+            clickable
+            removable
+            @click="selectTime(t)"
+            @remove="unpinTimer(t)"
+          >
             {{ t }}s
-            <q-icon name="push_pin" size="xs" class="q-ml-xs" @click.stop="unpinTimer(t)" />
           </q-chip>
         </div>
         <div class="row justify-center q-gutter-sm" v-if="store.recentTimers.length">
@@ -156,6 +163,8 @@ export default {
 .pinned-chip {
   background-color: #ffc107;
   color: #000;
+  font-size: 1.1rem;
+  padding: 4px 8px;
 }
 .recent-chip {
   background-color: #555;
