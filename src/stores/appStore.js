@@ -17,10 +17,22 @@ const defaultPreset = {
 
 export const useAppStore = defineStore('app', {
   state: () => {
-    let lastPreset = localStorage.getItem('last_preset')
-    if (lastPreset !== null) lastPreset = JSON.parse(lastPreset)
-    let presets = localStorage.getItem('presets')
-    if (presets !== null) presets = JSON.parse(presets)
+    let lastPreset
+    try {
+      const rawLastPreset = localStorage.getItem('last_preset')
+      if (rawLastPreset !== null) lastPreset = JSON.parse(rawLastPreset)
+    } catch (e) {
+      lastPreset = undefined
+    }
+
+    let presets
+    try {
+      const rawPresets = localStorage.getItem('presets')
+      if (rawPresets !== null) presets = JSON.parse(rawPresets)
+    } catch (e) {
+      presets = null
+    }
+
     return {
       ENV: {
         APP_URL: 'http://localhost:3000',
