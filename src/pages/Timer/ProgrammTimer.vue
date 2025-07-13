@@ -1,9 +1,9 @@
 <template>
   <q-page data-cy="page_about" class="full-height">
     <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
-    <q-btn :icon="!$store.getters.SETTINGS.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+    <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
       class="absolute-top-left"
-      @click="$store.commit('SET_SETTINGS_AUDIO_PLAYBACK', !$store.getters.SETTINGS.audio_playback)" />
+      @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     <div class="column text-center" style="height: 100vh; width: 100vw">
       <div class="col-1">Program</div>
       <!-- TIMER ELEMENT -->
@@ -197,18 +197,23 @@
 <script>
 import MY_ITEM_BTN from 'components/MyItemBtn.vue'
 import getRandomCitation from 'src/tools/citate.js'
+import { useAppStore } from 'stores/appStore'
 
 export default {
   name: 'ProgrammTimer',
   components: {
     MY_ITEM_BTN
   },
+  setup () {
+    const store = useAppStore()
+    return { store }
+  },
   data() {
     return {
       interval: undefined,
       timer_finished: false,
       timer_halted: false,
-      localData: JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET)),
+      localData: JSON.parse(JSON.stringify(this.store.lastPreset)),
       value: 0,
       TIME_DATA: undefined,
       TIME_IND: undefined,
@@ -279,7 +284,7 @@ export default {
     },
 
     PRESETS() {
-      return this.$store.getters.PRESETS
+      return this.store.presets
     },
 
     PRESET_LABEL() {
@@ -324,7 +329,7 @@ export default {
     },
 
     addPreset() {
-      this.localData = JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET))
+      this.localData = JSON.parse(JSON.stringify(this.store.lastPreset))
       this.localData.label = this.label_new_preset
     },
 
@@ -338,7 +343,7 @@ export default {
         dark: true
       }).onOk(() => {
         // remove preset
-        this.$store.commit('REMOVE_PRESET', label)
+        this.store.removePreset(label)
         this.localData.label = 'Letztes Programm'
       })
 
@@ -347,7 +352,7 @@ export default {
     selectPreset(preset) {
       if (preset.data === undefined) {
         // load last workout
-        this.localData = JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET))
+        this.localData = JSON.parse(JSON.stringify(this.store.lastPreset))
         return
       } else {
         this.localData.action.value = preset.data.action.value
@@ -373,7 +378,7 @@ export default {
       }).onOk(data => {
         // save preset
         // check if name already exists
-        const preset_exists = this.$store.getters.PRESETS.find(preset => preset.label === data)
+        const preset_exists = this.store.presets.find(preset => preset.label === data)
         if (data === this.label_new_preset || preset_exists) {
           return this.$q.notify({
             message: 'Bitte einen anderen Namen eingeben',
@@ -404,7 +409,7 @@ export default {
             }
           }
         }
-        this.$store.commit('ADD_PRESET', new_preset)
+        this.store.addPreset(new_preset)
 
 
       })
@@ -422,7 +427,7 @@ export default {
       this.playSound('beepbeepbeep_1s')
       await this.delay(1500)
 
-      this.$store.commit('SET_LAST_PRESET', JSON.parse(JSON.stringify(this.localData)))
+      this.store.setLastPreset(JSON.parse(JSON.stringify(this.localData)))
 
       // start timer
       this.nextTimer()
@@ -508,7 +513,7 @@ export default {
 
     // SOUNDS
     playSound(item) {
-      if (!this.$store.getters.SETTINGS.audio_playback) return
+      if (!this.store.settings.audio_playback) return
       if (this.$q.platform.is.cordova) {
         var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
 
