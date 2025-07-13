@@ -30,7 +30,6 @@ export default {
   },
   data() {
     return {
-      TEXT: this.store.TEXT
     }
   },
   mounted() {
