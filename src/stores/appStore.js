@@ -45,6 +45,7 @@ export const useAppStore = defineStore('app', {
       },
       LAST_PRESET: lastPreset || undefined,
       PRESETS: presets || templatePresets,
+      PROGRAM_STEPS: [],
       essentialLinks: [
         { titel: 'Home', caption: 'zurück', icon: 'home', route: 'Index' },
         { seperator: true },
@@ -59,7 +60,8 @@ export const useAppStore = defineStore('app', {
     env: state => state.ENV,
     settings: state => state.SETTINGS,
     lastPreset: state => state.LAST_PRESET || defaultPreset,
-    presets: state => state.PRESETS
+    presets: state => state.PRESETS,
+    programSteps: state => state.PROGRAM_STEPS
   },
     actions: {
       setSettingsAudioPlayback(payload) {
@@ -82,6 +84,22 @@ export const useAppStore = defineStore('app', {
         console.log({ message: 'REMOVE_PRESET' })
         this.PRESETS = this.PRESETS.filter(preset => preset.label !== label)
         window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
+      },
+      addProgramStep(step) {
+        this.PROGRAM_STEPS.push(step)
+      },
+      removeProgramStep(index) {
+        this.PROGRAM_STEPS.splice(index, 1)
+      },
+      moveProgramStep(from, to) {
+        const item = this.PROGRAM_STEPS.splice(from, 1)[0]
+        this.PROGRAM_STEPS.splice(to, 0, item)
+      },
+      updateProgramStep(index, partial) {
+        this.PROGRAM_STEPS[index] = {
+          ...this.PROGRAM_STEPS[index],
+          ...partial
+        }
       }
   }
 })

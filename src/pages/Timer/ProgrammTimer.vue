@@ -140,6 +140,24 @@
           </q-item>
 
 
+          <q-separator class="q-my-md" />
+          <q-item class="q-ma-sm" clickable @click="addStep">
+            <q-item-section avatar><q-icon name="add" /></q-item-section>
+            <q-item-section>Schritt hinzufügen</q-item-section>
+          </q-item>
+          <q-item v-for="(step, idx) in programSteps" :key="'step'+idx" class="q-ma-sm bg-grey-9" draggable
+            @dragstart="onDragStart(idx)" @dragover.prevent @drop="onDrop(idx)">
+            <q-item-section avatar>
+              <q-select dense emit-value map-options :options="STEP_OPTIONS" v-model="step.type" />
+            </q-item-section>
+            <q-item-section>
+              <q-slider v-model="step.duration" color="white" label label-text-color="dark" thumb-size="40px" :min="1" :max="300" />
+            </q-item-section>
+            <q-item-section side>
+              <q-input v-model.number="step.repetitions" type="number" dense style="width:50px" />
+              <q-btn flat icon="delete" @click.stop="removeStep(idx)" />
+            </q-item-section>
+          </q-item>
         </q-list>
 
 
@@ -171,8 +189,8 @@
         </q-knob>
 
         <div v-if="TIME_DATA && TIME_DATA[TIME_IND] && !timer_halted">
-          <q-chip>Übung: {{ TIME_DATA[TIME_IND].ind + 1 }} / {{ localData.exercises.value }}</q-chip>
-          <q-chip>Runde: {{ TIME_DATA[TIME_IND].round_ind + 1 }} / {{ localData.rounds.value }}</q-chip>
+          <q-chip>Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} / {{ programSteps.length }}</q-chip>
+          <q-chip>Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} / {{ programSteps[TIME_DATA[TIME_IND].step_ind].repetitions || 1 }}</q-chip>
         </div>
         <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND] && timer_halted">
           <MY_ITEM_BTN :label="'WEITER'" :icon="'play_arrow'" @clicked="proceedTimer()" />
@@ -219,15 +237,29 @@ export default {
       // progress state handled by composable
       TIME_DATA: undefined,
       TIME_IND: undefined,
-      label_new_preset: 'Neues Programm'
+      label_new_preset: 'Neues Programm',
+      dragIndex: null
 
     }
   },
   mounted() {
-
+    if (this.programSteps.length === 0) {
+      this.addStep()
+    }
   },
 
   computed: {
+    programSteps() {
+      return this.store.programSteps
+    },
+
+    STEP_OPTIONS() {
+      return [
+        { label: 'Action', value: 'action' },
+        { label: 'Pause', value: 'break' },
+        { label: 'Rundenpause', value: 'round_break' }
+      ]
+    },
     TIMER_VALUE() {
       if (!this.TIME_DATA) return 0
       // return the value of the current timer as difference from value and the current time
@@ -281,7 +313,7 @@ export default {
 
     DURATION_CALC() {
       if (this.TIME_DATA) return this.calcDuration(this.TIME_DATA)
-      else return this.calcDuration(this.localData)
+      else return this.calcDuration(this.programSteps)
 
     },
 
@@ -313,20 +345,25 @@ export default {
     },
 
     calcDuration(data) {
-      var total = 0 // in seconds
-      if (!Array.isArray(data)) {
+      let total = 0 // in seconds
+      if (Array.isArray(data)) {
+        if (data.length && data[0]._check !== undefined) {
+          data.forEach(time => {
+            if (time._check === false) total += time.value + 1
+          })
+          total -= this.progress
+        } else {
+          data.forEach(step => {
+            total += (step.duration) * (step.repetitions || 1)
+          })
+        }
+      } else {
         const { action, break: _break, exercises, rounds, round_break } = data
         const action_time = (action.value + 1) * exercises.value * rounds.value
         const break_time = (_break.value + 1) * (exercises.value - 1) * rounds.value
         const round_break_time = (round_break.value + 1) * (rounds.value - 1)
-        var total = action_time + break_time + round_break_time
-      } else {
-        data.forEach(time => {
-          if (time._check === false) total += time.value + 1
-        })
-        total -= this.progress
+        total = action_time + break_time + round_break_time
       }
-
       return total
     },
 
@@ -419,6 +456,24 @@ export default {
 
     },
 
+    addStep() {
+      this.store.addProgramStep({ type: 'action', duration: 30, repetitions: 1 })
+    },
+
+    removeStep(index) {
+      this.store.removeProgramStep(index)
+    },
+
+    onDragStart(idx) {
+      this.dragIndex = idx
+    },
+
+    onDrop(idx) {
+      if (this.dragIndex === null) return
+      this.store.moveProgramStep(this.dragIndex, idx)
+      this.dragIndex = null
+    },
+
     // TIMER
     async startTimer() {
       this.timer_finished = false
@@ -474,20 +529,19 @@ export default {
     },
 
     _prepareTimer() {
-      //prepare an array with the times
       const times = []
-      for (let round_i = 0; round_i < this.localData.rounds.value; round_i++) {
-        for (let i = 0; i < this.localData.exercises.value; i++) {
-          times.push({ type: 'action', value: this.localData.action.value, ind: i, round_ind: round_i, _check: false })
-          times.push({ type: 'break', value: this.localData.break.value, ind: i, round_ind: round_i, _check: false })
+      this.programSteps.forEach((step, stepInd) => {
+        const reps = step.repetitions || 1
+        for (let i = 0; i < reps; i++) {
+          times.push({
+            type: step.type,
+            value: step.duration,
+            step_ind: stepInd,
+            rep_ind: i,
+            _check: false
+          })
         }
-        if (round_i < this.localData.rounds.value - 1) {
-          times.pop() // remove last element, because it is a break
-          times.push({ type: 'round_break', value: this.localData.round_break.value, ind: 0, round_ind: round_i, _check: false })
-        }
-      }
-      // remove last element, because it is a break
-      times.pop()
+      })
       return times
     },
 
