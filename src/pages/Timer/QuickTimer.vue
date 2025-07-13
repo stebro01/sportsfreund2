@@ -47,6 +47,10 @@
 
 <script>
 import { useAppStore } from 'stores/appStore'
+import createSoundMap from 'src/tools/soundMap.js'
+import gong from 'assets/sounds/gong.wav'
+
+const soundMap = createSoundMap({ gong })
 export default {
   name: 'QuickTimer',
   components: {
@@ -146,7 +150,7 @@ export default {
         myMedia.play()
         return
       } else {
-        var audio = new Audio(require(`assets/sounds/${item}.wav`))
+        var audio = new Audio(soundMap[item])
         audio.play({ playAudioWhenScreenIsLocked: true })
         return
       }
