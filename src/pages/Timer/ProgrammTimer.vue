@@ -198,6 +198,12 @@
 import MY_ITEM_BTN from 'components/MyItemBtn.vue'
 import getRandomCitation from 'src/tools/citate.js'
 import { useAppStore } from 'stores/appStore'
+import createSoundMap from 'src/tools/soundMap.js'
+import beepbeepbeep_1s from 'assets/sounds/beepbeepbeep_1s.wav'
+import beep_1s from 'assets/sounds/beep_1s.wav'
+import tada from 'assets/sounds/tada.wav'
+
+const soundMap = createSoundMap({ beepbeepbeep_1s, beep_1s, tada })
 
 export default {
   name: 'ProgrammTimer',
@@ -530,7 +536,7 @@ export default {
         myMedia.play()
         return
       } else {
-        var audio = new Audio(require(`assets/sounds/${item}.wav`))
+        var audio = new Audio(soundMap[item])
         audio.play({ playAudioWhenScreenIsLocked: true })
         return
       }
