@@ -11,7 +11,7 @@
     "build_ios": "quasar build -m ios --ide",
     "icon": "icongenie generate -i ./public/logo_de.png",
     "icon_cordova": "icongenie generate -m cordova -i ./public/logo_de.png",
-    "lint": "eslint --ext .js,.vue ./",
+    "lint": "eslint .",
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
     "test:unit": "jest --updateSnapshot",
