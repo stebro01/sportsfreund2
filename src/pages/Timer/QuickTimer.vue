@@ -17,7 +17,7 @@
 
       <!-- CIRCLE -->
       <div class="col-7">
-        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_VALUE" size="150px" :thickness="0.2" color="green-4"
+        <q-knob show-value class="text-white q-ma-md timer-knob" v-model="TIMER_VALUE" size="180px" :thickness="0.2" color="green-4"
           :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
           <div>
             <div>{{ time - progress }}
@@ -36,6 +36,20 @@
           <q-btn class="my-decent-text" color="positive" @click="addTime(1)" round>+1</q-btn>
           <q-btn class="my-decent-text" color="negative" @click="addTime(-1)" round>-1</q-btn>
           <q-btn class="my-decent-text" color="negative" @click="addTime(-5)" round>-5</q-btn>
+        </div>
+      </div>
+      <div class="col-2">
+        <div class="row justify-center q-gutter-sm" v-if="store.pinnedTimers.length">
+          <q-chip v-for="t in store.pinnedTimers" :key="'p'+t" class="pinned-chip" clickable @click="selectTime(t)">
+            {{ t }}s
+            <q-icon name="push_pin" size="xs" class="q-ml-xs" @click.stop="unpinTimer(t)" />
+          </q-chip>
+        </div>
+        <div class="row justify-center q-gutter-sm" v-if="store.recentTimers.length">
+          <q-chip v-for="t in store.recentTimers" :key="'r'+t" class="recent-chip" clickable @click="selectTime(t)">
+            {{ t }}s
+            <q-icon name="push_pin" size="xs" class="q-ml-xs" @click.stop="pinTimer(t)" />
+          </q-chip>
         </div>
       </div>
 
@@ -106,6 +120,7 @@ export default {
           this.stopInterval()
           this.timer_finished = true
           this.store.setSettingsQuickTimerStartValue(this.time)
+          this.store.addRecentTimer(this.time)
         }
       })
 
@@ -114,6 +129,16 @@ export default {
     stopTimer() {
       this.stopInterval()
       this.timer_finished = false
+    },
+    selectTime(t) {
+      this.time = t
+      this.timer_finished = false
+    },
+    pinTimer(t) {
+      this.store.pinTimer(t)
+    },
+    unpinTimer(t) {
+      this.store.unpinTimer(t)
     }
 
 
@@ -122,3 +147,18 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.timer-knob {
+  box-shadow: 0 0 15px rgba(0, 255, 100, 0.6);
+  border-radius: 50%;
+}
+.pinned-chip {
+  background-color: #ffc107;
+  color: #000;
+}
+.recent-chip {
+  background-color: #555;
+  color: #fff;
+}
+</style>
