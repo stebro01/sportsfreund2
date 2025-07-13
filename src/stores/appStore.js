@@ -61,30 +61,27 @@ export const useAppStore = defineStore('app', {
     lastPreset: state => state.LAST_PRESET || defaultPreset,
     presets: state => state.PRESETS
   },
-  actions: {
-    log(payload) {
-      console.log(payload)
-    },
-    setSettingsAudioPlayback(payload) {
-      this.SETTINGS.audio_playback = payload
-    },
+    actions: {
+      setSettingsAudioPlayback(payload) {
+        this.SETTINGS.audio_playback = payload
+      },
     setSettingsQuickTimerStartValue(payload) {
       this.SETTINGS.quick_timer_start_value = payload
     },
-    setLastPreset(payload) {
-      this.log({ message: 'SET_LAST_PRESET' })
-      window.localStorage.setItem('last_preset', JSON.stringify(payload))
-      this.LAST_PRESET = payload
-    },
-    addPreset(payload) {
-      this.log({ message: 'ADD_PRESET' })
-      this.PRESETS.push(payload)
-      window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
-    },
-    removePreset(label) {
-      this.log({ message: 'REMOVE_PRESET' })
-      this.PRESETS = this.PRESETS.filter(preset => preset.label !== label)
-      window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
-    }
+      setLastPreset(payload) {
+        console.log({ message: 'SET_LAST_PRESET' })
+        window.localStorage.setItem('last_preset', JSON.stringify(payload))
+        this.LAST_PRESET = payload
+      },
+      addPreset(payload) {
+        console.log({ message: 'ADD_PRESET' })
+        this.PRESETS.push(payload)
+        window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
+      },
+      removePreset(label) {
+        console.log({ message: 'REMOVE_PRESET' })
+        this.PRESETS = this.PRESETS.filter(preset => preset.label !== label)
+        window.localStorage.setItem('presets', JSON.stringify(this.PRESETS))
+      }
   }
 })
