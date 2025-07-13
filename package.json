@@ -28,6 +28,7 @@
     "quasar": "^2.6.0",
     "raw-loader": "^4.0.2",
     "showdown": "^2.1.0",
+    "firebase": "^9.23.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0"
   },
