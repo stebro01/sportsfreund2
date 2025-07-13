@@ -10,9 +10,9 @@
       <!-- BTN -->
       <div class="col-2">
         <!-- START -->
-        <q-btn v-if="!interval" class="my-main-btn" @click="startTimer()">Start</q-btn>
+        <q-btn v-if="!isActive" class="my-main-btn" @click="startTimer()">Start</q-btn>
         <!-- STOP -->
-        <q-btn v-if="interval" class="my-main-btn" @click="stopTimer()">Stop</q-btn>
+        <q-btn v-if="isActive" class="my-main-btn" @click="stopTimer()">Stop</q-btn>
       </div>
 
       <!-- CIRCLE -->
@@ -20,8 +20,8 @@
         <q-knob show-value class="text-white q-ma-md" v-model="TIMER_VALUE" size="150px" :thickness="0.2" color="green-4"
           :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
           <div>
-            <div>{{ time - value }}
-              <q-popup-edit v-if="interval === undefined" v-model="time" auto-save v-slot="scope">
+            <div>{{ time - progress }}
+              <q-popup-edit v-if="!isActive" v-model="time" auto-save v-slot="scope">
                 <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
               </q-popup-edit>
             </div>
@@ -31,7 +31,7 @@
 
       </div>
       <div class="col-1">
-        <div class="row justify-center q-gutter-md" v-if="interval === undefined">
+        <div class="row justify-center q-gutter-md" v-if="!isActive">
           <q-btn class="my-decent-text" color="positive" @click="addTime(5)" round>+5</q-btn>
           <q-btn class="my-decent-text" color="positive" @click="addTime(1)" round>+1</q-btn>
           <q-btn class="my-decent-text" color="negative" @click="addTime(-1)" round>-1</q-btn>
@@ -48,6 +48,7 @@
 <script>
 import { useAppStore } from 'stores/appStore'
 import playSound from 'src/tools/sound.js'
+import useTimer from 'src/composables/useTimer'
 export default {
   name: 'QuickTimer',
   components: {
@@ -55,13 +56,12 @@ export default {
   },
   setup () {
     const store = useAppStore()
-    return { store }
+    const { start: startInterval, stop: stopInterval, progress, isActive } = useTimer()
+    return { store, startInterval, stopInterval, progress, isActive }
   },
   data() {
     return {
       time: this.store.settings.quick_timer_start_value,
-      value: 0,
-      interval: undefined,
       timer_finished: false
     }
   },
@@ -70,19 +70,14 @@ export default {
   },
 
   computed: {
-    TIMER_VALUE: {
-      get() {
-        return this.value / this.time * 100
-      },
-      set(value) {
-        this.value = value
-      }
+    TIMER_VALUE() {
+      return this.progress / this.time * 100
     }
   },
 
   methods: {
     goBack() {
-      if (this.interval) clearInterval(this.interval)
+      this.stopInterval()
       this.$router.go(-1)
     },
 
@@ -103,28 +98,21 @@ export default {
       playSound('gong', this.store.settings.audio_playback)
       this.timer_finished = false
       let timeLeft = this.time
-      this.value = 0
-      let value = 0
-      this.interval = setInterval(() => {
-        value = value + 1
+      this.progress = 0
+      this.startInterval(() => {
         timeLeft = timeLeft - 1
-        this.value = value
         if (timeLeft <= 0) {
           playSound('gong', this.store.settings.audio_playback)
-          clearInterval(this.interval)
-          this.interval = undefined
-          this.value = 0
+          this.stopInterval()
           this.timer_finished = true
           this.store.setSettingsQuickTimerStartValue(this.time)
         }
-      }, 1000)
+      })
 
     },
 
     stopTimer() {
-      clearInterval(this.interval)
-      this.interval = undefined
-      this.value = 0
+      this.stopInterval()
       this.timer_finished = false
     }
 
