@@ -11,11 +11,18 @@
 
 const ESLintPlugin = require('eslint-webpack-plugin')
 
+// Load environment variables from .env file
+const { parsed: env } = require('dotenv').config();
 
 const { configure } = require('quasar/wrappers');
 
 module.exports = configure(function (ctx) {
   return {
+    env: {
+      APP_URL: process.env.APP_URL,
+      APP_VERSION: process.env.APP_VERSION,
+      APP_NAME: process.env.APP_NAME
+    },
     // https://v2.quasar.dev/quasar-cli-webpack/supporting-ts
     supportTS: false,
 
