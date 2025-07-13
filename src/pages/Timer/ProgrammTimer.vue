@@ -9,12 +9,12 @@
       <!-- TIMER ELEMENT -->
       <!-- BTN -->
       <div class="col-2">
-        <MY_ITEM_BTN v-if="!interval && timer_halted === false" :label="'START'" :icon="'play_arrow'"
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === false" :label="'START'" :icon="'play_arrow'"
           @clicked="startTimer()" />
-        <MY_ITEM_BTN v-if="!interval && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
           @clicked="clearTimer()" />
-        <MY_ITEM_BTN v-if="interval && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
-        <MY_ITEM_BTN v-if="interval && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="isActive && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
+        <MY_ITEM_BTN v-if="isActive && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
       </div>
 
       <!-- DURATION -->
@@ -27,7 +27,7 @@
       </div>
 
       <!-- OPTIONS -->
-      <div v-if="interval === undefined && timer_halted === false" class="col row justify-center">
+      <div v-if="!isActive && timer_halted === false" class="col row justify-center">
         <!-- STEUER ELEMENTE -->
         <q-list class="" style="max-width: 400px; min-width: 350px">
           <!-- SELECTION / PREVIOUS -->
@@ -199,6 +199,7 @@ import MY_ITEM_BTN from 'components/MyItemBtn.vue'
 import getRandomCitation from 'src/tools/citate.js'
 import { useAppStore } from 'stores/appStore'
 import playSound from 'src/tools/sound.js'
+import useTimer from 'src/composables/useTimer'
 
 export default {
   name: 'ProgrammTimer',
@@ -207,15 +208,15 @@ export default {
   },
   setup () {
     const store = useAppStore()
-    return { store }
+    const { start: startInterval, stop: stopInterval, progress, isActive } = useTimer()
+    return { store, startInterval, stopInterval, progress, isActive }
   },
   data() {
     return {
-      interval: undefined,
       timer_finished: false,
       timer_halted: false,
       localData: JSON.parse(JSON.stringify(this.store.lastPreset)),
-      value: 0,
+      // progress state handled by composable
       TIME_DATA: undefined,
       TIME_IND: undefined,
       label_new_preset: 'Neues Programm'
@@ -231,7 +232,7 @@ export default {
       if (!this.TIME_DATA) return 0
       // return the value of the current timer as difference from value and the current time
       const currentTimer = this.TIME_DATA[this.TIME_IND]
-      return currentTimer.value - this.value
+      return currentTimer.value - this.progress
     },
 
     TIMER_PERCENTAGE() {
@@ -239,7 +240,7 @@ export default {
       // return the value of the current timer as difference from value and the current time
       const currentTimer = this.TIME_DATA[this.TIME_IND]
       if (!currentTimer) return 0
-      return this.value / currentTimer.value * 100
+      return this.progress / currentTimer.value * 100
     },
 
     TIMER_TYPE() {
@@ -300,7 +301,7 @@ export default {
 
   methods: {
     goBack() {
-      if (this.interval) clearInterval(this.interval)
+      this.stopInterval(false)
       this.$router.go(-1)
     },
 
@@ -323,7 +324,7 @@ export default {
         data.forEach(time => {
           if (time._check === false) total += time.value + 1
         })
-        total -= this.value
+        total -= this.progress
       }
 
       return total
@@ -423,7 +424,6 @@ export default {
       this.timer_finished = false
       this.timer_halted = false
       this.TIME_DATA = this._prepareTimer() // prepare an array with the times
-      this.interval = true
       // COUNT DOWN 1s
       playSound('beepbeepbeep_1s', this.store.settings.audio_playback)
       await this.delay(1500)
@@ -444,36 +444,33 @@ export default {
       // if no timer is left, stop
       if (this.TIME_IND === -1) {
         this.timer_finished = true
-        this.value = 0
+        this.progress = 0
         playSound('tada', this.store.settings.audio_playback)
         return
       } // else
 
       const nextTimer = this.TIME_DATA[this.TIME_IND]
 
-      this.value = VALUE || 0
+      this.progress = VALUE || 0
       // now start the intervall with ticks of 1s
-      this.interval = setInterval(() => {
+      this.startInterval(() => {
         // check if timer is finished
-        if (this.value + 1 === nextTimer.value) playSound('beep_1s', this.store.settings.audio_playback)
-        if (this.value >= nextTimer.value) {
+        if (this.progress === nextTimer.value - 1) playSound('beep_1s', this.store.settings.audio_playback)
+        if (this.progress >= nextTimer.value) {
 
           // set _check to true
           nextTimer._check = true
           // stop timer
-          clearInterval(this.interval)
+          this.stopInterval()
           // start next timer
           this.nextTimer()
-        } else {
-          // increase value
-          this.value++
         }
-      }, 1000)
+      })
     },
 
     proceedTimer() {
       this.timer_halted = false
-      this.nextTimer(this.value)
+      this.nextTimer(this.progress)
     },
 
     _prepareTimer() {
@@ -496,8 +493,7 @@ export default {
 
     stopTimer() {
       // stopp the timer / intervall
-      clearInterval(this.interval)
-      this.interval = undefined
+      this.stopInterval()
       this.timer_finished = false
       this.timer_halted = true
     },
@@ -506,7 +502,7 @@ export default {
       // clear the timer
       this.stopTimer()
       this.TIME_DATA = undefined
-      this.value = 0
+      this.progress = 0
       this.timer_halted = false
       this.timer_finished = false
     },
