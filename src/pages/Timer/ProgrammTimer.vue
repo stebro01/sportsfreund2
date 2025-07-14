@@ -331,6 +331,15 @@ export default {
 
   },
 
+  watch: {
+    localData: {
+      deep: true,
+      handler () {
+        this.generateStepsFromSettings()
+      }
+    }
+  },
+
   methods: {
     goBack() {
       this.stopInterval(false)
