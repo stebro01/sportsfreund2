@@ -17,7 +17,7 @@ describe('ProgramTimer', () => {
     const pinia = createPinia()
     setActivePinia(pinia)
     store = useAppStore()
-    store.addProgramStep({ type: 'action', duration: 1, repetitions: 1 })
+    store.PROGRAM_STEPS = [{ type: 'action', duration: 1, repetitions: 1 }]
     wrapper = shallowMount(ProgramTimer, {
       global: {
         plugins: [pinia],
@@ -149,21 +149,4 @@ describe('ProgramTimer', () => {
     expect(wrapper.vm.isActive).toBe(false)
   })
 
-  it('retains added steps when settings change', async () => {
-    const initial = store.programSteps.length
-    wrapper.vm.addStep()
-    expect(store.programSteps.length).toBe(initial + 1)
-    wrapper.vm.localData.action.value = 10
-    await wrapper.vm.$nextTick()
-    expect(store.programSteps.length).toBe(initial + 1)
-  })
-
-  it('keeps remaining steps after removal and settings update', async () => {
-    wrapper.vm.addStep()
-    wrapper.vm.removeStep(0)
-    const stepsSnapshot = JSON.parse(JSON.stringify(store.programSteps))
-    wrapper.vm.localData.break.value = 5
-    await wrapper.vm.$nextTick()
-    expect(store.programSteps).toEqual(stepsSnapshot)
-  })
 })

@@ -2,6 +2,9 @@
 
 A Quasar/Vue 3 timer application for organizing workouts. The app offers Quick Timer and Program Timer modes and lets you invite friends to share sessions.
 
+### Program Timer
+Workout steps are created automatically from your preset settings. Manual step addition is no longer available.
+
 ## Project setup
 Install dependencies using npm or yarn:
 
