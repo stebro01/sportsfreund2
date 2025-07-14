@@ -115,4 +115,28 @@ describe('ProgramTimer', () => {
     const expected = altWrapper.vm.calcDuration(localStore.lastPreset)
     expect(altWrapper.vm.DURATION_CALC).toBe(expected)
   })
+
+  it('updates program when preset is selected', async () => {
+    const preset = store.presets.find(p => p.data)
+    wrapper.vm.selectPreset(preset)
+    await wrapper.vm.$nextTick()
+
+    const expectedSteps = []
+    const { action, break: brk, exercises, rounds, round_break } = preset.data
+    for (let r = 0; r < rounds.value; r++) {
+      for (let e = 0; e < exercises.value; e++) {
+        expectedSteps.push({ type: 'action', duration: action.value, repetitions: 1 })
+        if (e < exercises.value - 1) {
+          expectedSteps.push({ type: 'break', duration: brk.value, repetitions: 1 })
+        }
+      }
+      if (r < rounds.value - 1) {
+        expectedSteps.push({ type: 'round_break', duration: round_break.value, repetitions: 1 })
+      }
+    }
+
+    expect(store.programSteps).toEqual(expectedSteps)
+    expect(wrapper.vm.DURATION_CALC).toBe(wrapper.vm.calcDuration(preset.data))
+    expect(wrapper.vm.isActive).toBe(false)
+  })
 })
