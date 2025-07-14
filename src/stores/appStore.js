@@ -114,7 +114,10 @@ export const useAppStore = defineStore("app", {
     },
     removePreset(label) {
       console.log({ message: "REMOVE_PRESET" });
-      this.PRESETS = this.PRESETS.filter((preset) => preset.label !== label);
+      const target = label.trim().toLowerCase();
+      this.PRESETS = this.PRESETS.filter(
+        (preset) => preset.label.trim().toLowerCase() !== target
+      );
       window.localStorage.setItem("presets", JSON.stringify(this.PRESETS));
     },
 
