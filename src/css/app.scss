@@ -47,16 +47,6 @@ body {
   background-color: $decent;
 }
 
-.my-main-btn {
-  background-color: $primary;
-  opacity: 0.9;
-  width: 80vw;
-  max-width: 220px;
-  font-size: 1.2em;
-  // rounded corners
-  border-radius: 10px;
-}
-
 .my-action-item {
   background-color: rgba(0, 128, 0, 0.09);
   color: $positive;
@@ -108,8 +98,12 @@ body {
   }
 
   .my-main-btn {
-    width: 300px;
-    max-width: 300px;
     font-size: 1.4em;
+    background-color: $primary;
+    opacity: 0.9;
+    width: 80vw;
+    max-width: 350px;
+    // rounded corners
+    border-radius: 10px;
   }
 }

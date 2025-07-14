@@ -1,50 +1,19 @@
 <template>
   <q-page data-cy="page_about" class="full-height">
-    <q-btn
-      icon="close"
-      size="lg"
-      flat
-      round
-      class="absolute-top-right"
-      @click="goBack()"
-    />
-    <q-btn
-      :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'"
-      size="lg"
-      flat
-      round
-      class="absolute-top-left"
-      @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)"
-    />
+    <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
+    <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+      class="absolute-top-left" @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     <div class="column text-center" style="height: 100vh; width: 100vw">
       <div class="col-1">Program</div>
       <!-- TIMER ELEMENT -->
       <!-- BTN -->
       <div class="col-2">
-        <MY_ITEM_BTN
-          v-if="!isActive && timer_halted === false"
-          :label="'START'"
-          :icon="'play_arrow'"
-          @clicked="startTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="!isActive && timer_halted === true"
-          :label="'ABBRECHEN'"
-          :icon="'close'"
-          @clicked="clearTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="isActive && !timer_finished"
-          :label="'STOP'"
-          :icon="'stop'"
-          @clicked="stopTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="isActive && timer_finished"
-          :label="'ZURÜCK'"
-          :icon="'arrow_back'"
-          @clicked="clearTimer()"
-        />
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === false" :label="'START'" :icon="'play_arrow'"
+          @clicked="startTimer()" />
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
+          @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="isActive && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
+        <MY_ITEM_BTN v-if="isActive && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
       </div>
 
       <!-- DURATION -->
@@ -59,71 +28,41 @@
       <!-- OPTIONS -->
       <div v-if="!isActive && timer_halted === false" class="col">
         <!-- STEUER ELEMENTE -->
-        <q-row
-          class="q-col-gutter-sm justify-center"
-          style="max-width: 400px; min-width: 300px"
-        >
+        <div class="row q-gutter-y-sm justify-center" style="width: 100vw; max-width: 1000px">
           <!-- SELECTION / PREVIOUS -->
-          <q-item clickable v-ripple class="q-ma-sm">
-            <q-item-section avatar><q-icon name="today" /></q-item-section>
-            <q-item-section>
-              <q-btn-dropdown flat no-caps :label="PRESET_LABEL">
-                <q-list class="bg-dark">
-                  <q-item
-                    clickable
-                    v-close-popup
-                    v-ripple
-                    v-for="preset in PRESETS"
-                    :key="preset.label + 'presetlist'"
-                    @click="selectPreset(preset)"
-                  >
-                    <q-item-section>{{ preset.label }}</q-item-section>
-                    <q-item-section v-if="preset.data" side>
-                      <q-icon name="av_timer" />{{
-                        formatTime(calcDuration(preset.data))
-                      }}</q-item-section
-                    >
-                  </q-item>
-                  <q-item avatar v-close-popup="">
-                    <q-btn
-                      flat
-                      size="md"
-                      icon="add"
-                      @click="addPreset()"
-                    ></q-btn>
-                  </q-item>
-                </q-list>
-              </q-btn-dropdown>
-            </q-item-section>
-            <q-item-section side v-if="localData.label === label_new_preset"
-              ><q-btn
-                flat
-                icon="save"
-                @click="saveNewPreset()"
-                color="white"
-              ></q-btn
-            ></q-item-section>
-            <q-item-section
-              side
-              v-else-if="
+          <div class="col-12">
+            <q-item clickable v-ripple class="q-ma-sm">
+              <q-item-section avatar><q-icon name="today" /></q-item-section>
+              <q-item-section>
+                <q-btn-dropdown flat no-caps :label="PRESET_LABEL">
+                  <q-list class="bg-dark">
+                    <q-item clickable v-close-popup v-ripple v-for="preset in PRESETS"
+                      :key="preset.label + 'presetlist'" @click="selectPreset(preset)">
+                      <q-item-section>{{ preset.label }}</q-item-section>
+                      <q-item-section v-if="preset.data" side>
+                        <q-icon name="av_timer" />{{
+                          formatTime(calcDuration(preset.data))
+                        }}</q-item-section>
+                    </q-item>
+                    <q-item avatar v-close-popup="">
+                      <q-btn flat size="md" icon="add" @click="addPreset()"></q-btn>
+                    </q-item>
+                  </q-list>
+                </q-btn-dropdown>
+              </q-item-section>
+              <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
+                  @click="saveNewPreset()" color="white"></q-btn></q-item-section>
+              <q-item-section side v-else-if="
                 localData.label !== label_new_preset &&
                 localData.label !== 'Default'
-              "
-              ><q-btn
-                flat
-                icon="delete"
-                @click="removePreset(this.localData.label)"
-                color="grey-5"
-              ></q-btn
-            ></q-item-section>
-          </q-item>
+              "><q-btn flat icon="delete" @click="removePreset(this.localData.label)"
+                  color="grey-5"></q-btn></q-item-section>
+            </q-item>
+          </div>
 
           <!-- Action -->
-          <q-col cols="12">
-            <q-btn
-              class="full-width my-main-btn"
-              @click="showActionDialog = true"
-            >
+          <div class="col-12">
+            <q-btn no-caps class="my-main-btn" @click="showActionDialog = true">
               <q-icon name="play_circle" class="q-mr-sm" />Action:
               {{ formatTime(localData.action.value) }}
             </q-btn>
@@ -131,23 +70,15 @@
               <q-card class="my-popup-card text-center shadow-1">
                 <q-card-section>Action anpassen</q-card-section>
                 <q-card-section>
-                  <DurationSlider
-                    v-model="localData.action.value"
-                    :min="5"
-                    :max="3600"
-                  />
+                  <DurationSlider v-model="localData.action.value" :min="5" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-dialog>
-          </q-col>
+          </div>
 
           <!-- Pause -->
-          <q-col cols="12">
-            <q-btn
-              class="full-width my-main-btn"
-              color="negative"
-              @click="showBreakDialog = true"
-            >
+          <div class="col-12">
+            <q-btn no-caps class=" my-main-btn" color="negative" @click="showBreakDialog = true">
               <q-icon name="pause_circle" class="q-mr-sm" />Pause:
               {{ formatTime(localData.break.value) }}
             </q-btn>
@@ -155,23 +86,15 @@
               <q-card class="my-popup-card text-center shadow-1">
                 <q-card-section>Pause anpassen</q-card-section>
                 <q-card-section>
-                  <DurationSlider
-                    v-model="localData.break.value"
-                    :min="0"
-                    :max="3600"
-                  />
+                  <DurationSlider v-model="localData.break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-dialog>
-          </q-col>
+          </div>
 
           <!-- Excercises -->
-          <q-col cols="12">
-            <q-btn
-              class="full-width my-main-btn"
-              color="secondary"
-              @click="showExerciseDialog = true"
-            >
+          <div class="col-12">
+            <q-btn no-caps class=" my-main-btn" color="secondary" @click="showExerciseDialog = true">
               <q-icon name="fitness_center" class="q-mr-sm" />Übungen:
               {{ localData.exercises.value }} {{ localData.exercises.unit }}
             </q-btn>
@@ -179,40 +102,22 @@
               <q-card class="my-popup-card text-center shadow-1">
                 <q-card-section>Übungen anpassen</q-card-section>
                 <q-card-section>
-                  <q-slider
-                    v-model="localData.exercises.value"
-                    label
-                    label-text-color="dark"
-                    color="white"
-                    thumb-size="50px"
-                    :step="1"
-                    :min="1"
-                    :max="50"
-                  />
+                  <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
+                    thumb-size="50px" :step="1" :min="1" :max="50" />
                 </q-card-section>
                 <q-card-section v-if="localData.exercises.value > 1">
                   <div class="q-gutter-sm">
-                    <q-input
-                      v-for="n in localData.exercises.value"
-                      :key="'name' + n"
-                      dense
-                      type="text"
-                      :label="'Übung ' + n"
-                      v-model="localData.exerciseNames[n - 1]"
-                    />
+                    <q-input v-for="n in localData.exercises.value" :key="'name' + n" dense type="text"
+                      :label="'Übung ' + n" v-model="localData.exerciseNames[n - 1]" />
                   </div>
                 </q-card-section>
               </q-card>
             </q-dialog>
-          </q-col>
+          </div>
 
           <!-- Repetitions -->
-          <q-col cols="12">
-            <q-btn
-              class="full-width my-main-btn"
-              color="secondary"
-              @click="showRoundsDialog = true"
-            >
+          <div class="col-12">
+            <q-btn no-caps class=" my-main-btn" color="secondary" @click="showRoundsDialog = true">
               <q-icon name="restart_alt" class="q-mr-sm" />Wiederholungen:
               {{ localData.rounds.value }} {{ localData.rounds.unit }}
             </q-btn>
@@ -220,28 +125,16 @@
               <q-card class="my-popup-card text-center shadow-1">
                 <q-card-section>Wiederholungen anpassen</q-card-section>
                 <q-card-section>
-                  <q-slider
-                    v-model="localData.rounds.value"
-                    label
-                    label-text-color="dark"
-                    color="white"
-                    thumb-size="50px"
-                    :step="1"
-                    :min="1"
-                    :max="50"
-                  />
+                  <q-slider v-model="localData.rounds.value" label label-text-color="dark" color="white"
+                    thumb-size="50px" :step="1" :min="1" :max="50" />
                 </q-card-section>
               </q-card>
             </q-dialog>
-          </q-col>
+          </div>
 
           <!-- BREAKS -->
-          <q-col cols="12">
-            <q-btn
-              class="full-width my-main-btn"
-              color="negative"
-              @click="showRoundBreakDialog = true"
-            >
+          <div class="col-12">
+            <q-btn no-caps class="my-main-btn" color="negative" @click="showRoundBreakDialog = true">
               <q-icon name="restore" class="q-mr-sm" />Rundenpause:
               {{ formatTime(localData.round_break.value) }}
             </q-btn>
@@ -249,54 +142,27 @@
               <q-card class="my-popup-card text-center shadow-1">
                 <q-card-section>Rundenpause anpassen</q-card-section>
                 <q-card-section>
-                  <DurationSlider
-                    v-model="localData.round_break.value"
-                    :min="0"
-                    :max="3600"
-                  />
+                  <DurationSlider v-model="localData.round_break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-dialog>
-          </q-col>
+          </div>
 
           <q-separator class="q-my-md" />
-          <q-item
-            v-for="(step, idx) in programSteps"
-            :key="'step' + idx"
-            class="q-ma-sm bg-grey-9"
-            draggable
-            @dragstart="onDragStart(idx)"
-            @dragover.prevent
-            @drop="onDrop(idx)"
-          >
+          <q-item v-for="(step, idx) in programSteps" :key="'step' + idx" class="q-ma-sm bg-grey-9" draggable
+            @dragstart="onDragStart(idx)" @dragover.prevent @drop="onDrop(idx)">
             <q-item-section avatar>
-              <q-select
-                dense
-                emit-value
-                map-options
-                :options="STEP_OPTIONS"
-                v-model="step.type"
-              />
+              <q-select dense emit-value map-options :options="STEP_OPTIONS" v-model="step.type" />
             </q-item-section>
             <q-item-section>
-              <q-btn
-                class="full-width my-main-btn"
-                @click="openStepDurationDialog(idx)"
-              >
+              <q-btn class="full-width my-main-btn" @click="openStepDurationDialog(idx)">
                 {{ formatTime(step.duration) }}
               </q-btn>
-              <q-dialog
-                :model-value="stepDialogIndex === idx"
-                @hide="stepDialogIndex = null"
-              >
+              <q-dialog :model-value="stepDialogIndex === idx" @hide="stepDialogIndex = null">
                 <q-card class="my-popup-card text-center shadow-1">
                   <q-card-section>Dauer anpassen</q-card-section>
                   <q-card-section>
-                    <DurationSlider
-                      v-model="step.duration"
-                      :min="1"
-                      :max="3600"
-                    />
+                    <DurationSlider v-model="step.duration" :min="1" :max="3600" />
                   </q-card-section>
                 </q-card>
               </q-dialog>
@@ -305,45 +171,25 @@
               <q-btn dense class="my-main-btn" @click="openStepRepDialog(idx)">
                 x{{ step.repetitions || 1 }}
               </q-btn>
-              <q-dialog
-                :model-value="repDialogIndex === idx"
-                @hide="repDialogIndex = null"
-              >
+              <q-dialog :model-value="repDialogIndex === idx" @hide="repDialogIndex = null">
                 <q-card class="my-popup-card text-center shadow-1">
                   <q-card-section>Wiederholungen anpassen</q-card-section>
                   <q-card-section>
-                    <q-slider
-                      v-model.number="step.repetitions"
-                      label
-                      label-text-color="dark"
-                      color="white"
-                      thumb-size="50px"
-                      :step="1"
-                      :min="1"
-                      :max="50"
-                    />
+                    <q-slider v-model.number="step.repetitions" label label-text-color="dark" color="white"
+                      thumb-size="50px" :step="1" :min="1" :max="50" />
                   </q-card-section>
                 </q-card>
               </q-dialog>
               <q-btn flat icon="delete" @click.stop="removeStep(idx)" />
             </q-item-section>
           </q-item>
-        </q-row>
+        </div>
       </div>
 
       <!-- TIMER -->
       <div v-else class="col-2">
-        <q-knob
-          show-value
-          class="text-white q-ma-md"
-          v-model="TIMER_PERCENTAGE"
-          size="150px"
-          :thickness="0.2"
-          color="grey-3"
-          :center-color="TIMER_COLOR"
-          track-color="transparent"
-          readonly=""
-        >
+        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_PERCENTAGE" size="150px" :thickness="0.2"
+          color="grey-3" :center-color="TIMER_COLOR" track-color="transparent" readonly="">
           <div v-if="timer_finished === true">
             <span style="font-size: 3em">🥇</span>
           </div>
@@ -364,23 +210,15 @@
         </q-knob>
 
         <div v-if="TIME_DATA && TIME_DATA[TIME_IND] && !timer_halted">
-          <q-chip
-            >Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} /
-            {{ programSteps.length }}</q-chip
-          >
-          <q-chip
-            >Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} /
+          <q-chip>Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} /
+            {{ programSteps.length }}</q-chip>
+          <q-chip>Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} /
             {{
               programSteps[TIME_DATA[TIME_IND].step_ind].repetitions || 1
-            }}</q-chip
-          >
+            }}</q-chip>
         </div>
         <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND] && timer_halted">
-          <MY_ITEM_BTN
-            :label="'WEITER'"
-            :icon="'play_arrow'"
-            @clicked="proceedTimer()"
-          />
+          <MY_ITEM_BTN :label="'WEITER'" :icon="'play_arrow'" @clicked="proceedTimer()" />
         </div>
         <div v-else-if="timer_finished" class="text-orange-4">
           <div>
