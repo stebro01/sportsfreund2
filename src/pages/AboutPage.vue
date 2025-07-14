@@ -1,47 +1,39 @@
 <template>
-  <q-page data-cy="page_about" class="page-size no-pointer-events non-selectable">
-
+  <q-page
+    data-cy="page_about"
+    class="page-size no-pointer-events non-selectable"
+  >
     <div class="column items-center q-px-xl">
       <div class="col">
-        <p v-html="missionTxt" class=" standard_text"></p>
+        <p v-html="missionTxt" class="standard_text"></p>
       </div>
-      <div class="col">
-
-      </div>
+      <div class="col"></div>
     </div>
-
-
   </q-page>
 </template>
 
 <script>
-import showdown from "showdown"
-import MD_TEXT from 'raw-loader!../../ABOUT.md'
-import { useAppStore } from 'stores/appStore'
+import showdown from "showdown";
+import MD_TEXT from "../../ABOUT.md?raw";
+import { useAppStore } from "stores/appStore";
 
 export default {
-  name: 'AboutPage',
-  components: {
-
-  },
-  setup () {
-    const store = useAppStore()
-    return { store }
+  name: "AboutPage",
+  components: {},
+  setup() {
+    const store = useAppStore();
+    return { store };
   },
   data() {
-    return {
-    }
+    return {};
   },
-  mounted() {
-
-  },
+  mounted() {},
   computed: {
     missionTxt() {
       var converter = new showdown.Converter(),
         html = converter.makeHtml(MD_TEXT);
-      return html
+      return html;
     },
   },
-}
-
+};
 </script>

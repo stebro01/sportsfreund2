@@ -1,42 +1,34 @@
 <template>
-  <q-page data-cy="page_about" class="page-size no-pointer-events non-selectable">
-
+  <q-page
+    data-cy="page_about"
+    class="page-size no-pointer-events non-selectable"
+  >
     <div class="column items-center q-px-xl">
       <div class="col">
-        <p v-html="missionTxt" class=" standard_text"></p>
+        <p v-html="missionTxt" class="standard_text"></p>
       </div>
-      <div class="col">
-
-      </div>
+      <div class="col"></div>
     </div>
-
-
   </q-page>
 </template>
 
 <script>
-import showdown from "showdown"
-import MD_TEXT from 'raw-loader!../../CHANGELOG.md'
+import showdown from "showdown";
+import MD_TEXT from "../../CHANGELOG.md?raw";
 
 export default {
-  name: 'ChangeLogPage',
-  components: {
-
-  },
+  name: "ChangeLogPage",
+  components: {},
   data() {
-    return {
-    }
+    return {};
   },
-  mounted() {
-
-  },
+  mounted() {},
   computed: {
     missionTxt() {
       var converter = new showdown.Converter(),
         html = converter.makeHtml(MD_TEXT);
-      return html
+      return html;
     },
   },
-}
-
+};
 </script>
