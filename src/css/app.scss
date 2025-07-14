@@ -68,8 +68,8 @@ body {
 
 .my-popup-card {
   height: 150px;
-  min-width: 350px;
-  width: 300px;
+  width: 90vw;
+  max-width: 350px;
   background-color: $dark;
   color: $light;
 }
