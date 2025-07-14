@@ -50,7 +50,8 @@ body {
 .my-main-btn {
   background-color: $primary;
   opacity: 0.9;
-  width: 220px;
+  width: 80vw;
+  max-width: 220px;
   font-size: 1.2em;
   // rounded corners
   border-radius: 10px;
@@ -108,6 +109,7 @@ body {
 
   .my-main-btn {
     width: 300px;
+    max-width: 300px;
     font-size: 1.4em;
   }
 }
