@@ -243,7 +243,7 @@ export default {
   },
   mounted() {
     if (this.programSteps.length === 0) {
-      this.addStep()
+      this.generateStepsFromSettings()
     }
   },
 
@@ -312,7 +312,8 @@ export default {
 
     DURATION_CALC() {
       if (this.TIME_DATA) return this.calcDuration(this.TIME_DATA)
-      else return this.calcDuration(this.programSteps)
+      if (this.programSteps.length) return this.calcDuration(this.programSteps)
+      return this.calcDuration(this.localData)
 
     },
 

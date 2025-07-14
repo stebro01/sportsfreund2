@@ -80,4 +80,39 @@ describe('ProgramTimer', () => {
       { type: 'action', duration: 2, repetitions: 1 }
     ])
   })
+
+  it('uses last preset duration when no program steps exist on mount', () => {
+    const pinia = createPinia()
+    setActivePinia(pinia)
+    localStorage.clear()
+    const localStore = useAppStore()
+    const altWrapper = shallowMount(ProgramTimer, {
+      global: {
+        plugins: [pinia],
+        mocks: { $router: { go: jest.fn() } },
+        stubs: {
+          'q-page': true,
+          'q-btn': true,
+          'q-chip': true,
+          'q-list': true,
+          'q-item': true,
+          'q-item-section': true,
+          'q-btn-dropdown': true,
+          'q-popup-proxy': true,
+          'q-card': true,
+          'q-card-section': true,
+          'duration-slider': true,
+          'q-slider': true,
+          'q-select': true,
+          'q-input': true,
+          'q-tooltip': true,
+          'q-separator': true,
+          'q-icon': true,
+          'q-knob': true
+        }
+      }
+    })
+    const expected = altWrapper.vm.calcDuration(localStore.lastPreset)
+    expect(altWrapper.vm.DURATION_CALC).toBe(expected)
+  })
 })
