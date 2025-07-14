@@ -5,6 +5,7 @@
       :step="step"
       :min="min"
       :max="max"
+      :label-value="labelValue"
       color="white"
       label
       label-text-color="dark"
@@ -27,42 +28,55 @@
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed } from "vue";
 
 const props = defineProps({
   modelValue: {
     type: Number,
-    required: true
+    required: true,
   },
   min: {
     type: Number,
-    default: 0
+    default: 0,
   },
   max: {
     type: Number,
-    default: 3600
+    default: 3600,
+  },
+});
+
+const emit = defineEmits(["update:modelValue"]);
+
+const proxyValue = ref(props.modelValue);
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    proxyValue.value = val;
   }
-})
-
-const emit = defineEmits(['update:modelValue'])
-
-const proxyValue = ref(props.modelValue)
-
-watch(() => props.modelValue, (val) => {
-  proxyValue.value = val
-})
+);
 
 watch(proxyValue, (val) => {
-  emit('update:modelValue', val)
-})
+  emit("update:modelValue", val);
+});
 
-const step = computed(() => proxyValue.value <= 60 ? 5 : 10)
+const step = computed(() => (proxyValue.value < 60 ? 5 : 10));
 
-const popup = ref(null)
-function openEdit () {
-  popup.value && popup.value.show()
+const labelValue = computed(() => {
+  const val = proxyValue.value;
+  if (val < 60) {
+    return `${val}s`;
+  }
+  const minutes = Math.floor(val / 60);
+  const seconds = val % 60;
+  return seconds ? `${minutes}m ${seconds}s` : `${minutes}m`;
+});
+
+const popup = ref(null);
+function openEdit() {
+  popup.value && popup.value.show();
 }
-function closeEdit () {
-  popup.value && popup.value.hide()
+function closeEdit() {
+  popup.value && popup.value.hide();
 }
 </script>
