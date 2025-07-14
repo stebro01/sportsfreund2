@@ -16,6 +16,7 @@ describe('QuickTimer', () => {
     jest.useFakeTimers()
     const pinia = createPinia()
     setActivePinia(pinia)
+    localStorage.clear()
     store = useAppStore()
     wrapper = shallowMount(QuickTimer, {
       global: {
@@ -62,5 +63,20 @@ describe('QuickTimer', () => {
     expect(wrapper.vm.bigStep).toBe(5)
     wrapper.vm.time = 65
     expect(wrapper.vm.bigStep).toBe(10)
+  })
+
+  it('togglePin pins and unpins the current timer', () => {
+    wrapper.vm.time = 5
+    wrapper.vm.togglePin()
+    expect(store.pinnedTimers).toContain(5)
+    wrapper.vm.togglePin()
+    expect(store.pinnedTimers).not.toContain(5)
+  })
+
+  it('filteredRecentTimers excludes pinned values', () => {
+    store.addRecentTimer(5)
+    store.addRecentTimer(10)
+    store.pinTimer(10)
+    expect(wrapper.vm.filteredRecentTimers).toEqual([5])
   })
 })

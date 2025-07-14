@@ -65,6 +65,17 @@
             <div class="my-small-text">Sekunden</div>
           </div>
         </q-knob>
+        <q-btn
+          flat
+          round
+          dense
+          size="sm"
+          icon="push_pin"
+          :color="isPinned ? 'amber-7' : 'grey-6'"
+          @click="togglePin"
+          class="absolute"
+          style="top: 10px; right: 10px"
+        />
       </div>
       <div class="col-1">
         <div class="row justify-center q-gutter-md" v-if="!isActive">
@@ -116,7 +127,7 @@
         {{ t }}s
       </q-btn>
       <q-btn
-        v-for="t in store.recentTimers"
+        v-for="t in filteredRecentTimers"
         :key="'r' + t"
         round
         size="sm"
@@ -161,6 +172,14 @@ export default {
     },
     bigStep() {
       return this.time >= 60 ? 10 : 5;
+    },
+    isPinned() {
+      return this.store.pinnedTimers.includes(this.time);
+    },
+    filteredRecentTimers() {
+      return this.store.recentTimers.filter(
+        (t) => !this.store.pinnedTimers.includes(t)
+      );
     },
   },
 
@@ -221,6 +240,13 @@ export default {
     },
     unpinTimer(t) {
       this.store.unpinTimer(t);
+    },
+    togglePin() {
+      if (this.isPinned) {
+        this.unpinTimer(this.time);
+      } else {
+        this.pinTimer(this.time);
+      }
     },
 
     // ENDE
