@@ -206,14 +206,16 @@
                   </div>
                 </q-card-section>
               </q-card>
-            </q-dialog>
-          </div>
+          </q-dialog>
+        </div>
 
-          <!-- Repetitions -->
-          <div class="col-12">
-            <q-btn
-              no-caps
-              class="my-main-btn"
+        <q-separator class="q-my-md" />
+
+        <!-- Repetitions -->
+        <div class="col-12">
+          <q-btn
+            no-caps
+            class="my-main-btn"
               color="secondary"
               @click="showRoundsDialog = true"
             >
