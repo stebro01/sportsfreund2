@@ -64,8 +64,7 @@
                 <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Action anpassen</q-card-section>
                 <q-card-section>
-                  <q-slider v-model="localData.action.value" color="white" label label-text-color="dark" thumb-size="50px"
-                    :step="1" :min="5" :max="120" />
+                  <DurationSlider v-model="localData.action.value" :min="5" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-popup-proxy>
@@ -81,8 +80,7 @@
                 <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Pause anpassen</q-card-section>
                 <q-card-section>
-                  <q-slider v-model="localData.break.value" color="white" label label-text-color="dark" thumb-size="50px"
-                    :step="1" :min="0" :max="60" />
+                  <DurationSlider v-model="localData.break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-popup-proxy>
@@ -132,8 +130,7 @@
                 <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Rundenpause anpassen</q-card-section>
                 <q-card-section>
-                  <q-slider v-model="localData.round_break.value" label label-text-color="dark" color="white"
-                    thumb-size="50px" :step="1" :min="0" :max="60" />
+                  <DurationSlider v-model="localData.round_break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
             </q-popup-proxy>
@@ -151,7 +148,7 @@
               <q-select dense emit-value map-options :options="STEP_OPTIONS" v-model="step.type" />
             </q-item-section>
             <q-item-section>
-              <q-slider v-model="step.duration" color="white" label label-text-color="dark" thumb-size="40px" :min="1" :max="300" />
+              <DurationSlider v-model="step.duration" :min="1" :max="3600" />
             </q-item-section>
             <q-item-section side>
               <q-input v-model.number="step.repetitions" type="number" dense style="width:50px" />
@@ -214,6 +211,7 @@
 
 <script>
 import MY_ITEM_BTN from 'components/MyItemBtn.vue'
+import DurationSlider from 'components/DurationSlider.vue'
 import getRandomCitation from 'src/tools/citate.js'
 import { useAppStore } from 'stores/appStore'
 import playSound from 'src/tools/sound.js'
@@ -222,7 +220,8 @@ import useTimer from 'src/composables/useTimer'
 export default {
   name: 'ProgrammTimer',
   components: {
-    MY_ITEM_BTN
+    MY_ITEM_BTN,
+    DurationSlider
   },
   setup () {
     const store = useAppStore()

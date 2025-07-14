@@ -33,6 +33,7 @@ describe('ProgramTimer', () => {
           'q-popup-proxy': true,
           'q-card': true,
           'q-card-section': true,
+          'duration-slider': true,
           'q-slider': true,
           'q-select': true,
           'q-input': true,
