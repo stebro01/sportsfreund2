@@ -144,10 +144,6 @@
 
 
           <q-separator class="q-my-md" />
-          <q-item class="q-ma-sm" clickable @click="addStep">
-            <q-item-section avatar><q-icon name="add" /></q-item-section>
-            <q-item-section>Schritt hinzufügen</q-item-section>
-          </q-item>
           <q-item v-for="(step, idx) in programSteps" :key="'step'+idx" class="q-ma-sm bg-grey-9" draggable
             @dragstart="onDragStart(idx)" @dragover.prevent @drop="onDrop(idx)">
             <q-item-section avatar>
@@ -484,10 +480,6 @@ export default {
       })
 
 
-    },
-
-    addStep() {
-      this.store.addProgramStep({ type: 'action', duration: 30, repetitions: 1 })
     },
 
     removeStep(index) {

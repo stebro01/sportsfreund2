@@ -144,9 +144,6 @@ export const useAppStore = defineStore("app", {
         JSON.stringify(this.PINNED_TIMERS)
       );
     },
-    addProgramStep(step) {
-      this.PROGRAM_STEPS.push(step);
-    },
     removeProgramStep(index) {
       this.PROGRAM_STEPS.splice(index, 1);
     },
