@@ -533,6 +533,10 @@ export default {
   },
 
   watch: {
+    "localData.action.value": "generateStepsFromSettings",
+    "localData.break.value": "generateStepsFromSettings",
+    "localData.rounds.value": "generateStepsFromSettings",
+    "localData.round_break.value": "generateStepsFromSettings",
     "localData.exercises.value"(val) {
       if (val > this.localData.exerciseNames.length) {
         for (let i = this.localData.exerciseNames.length; i < val; i++) {
@@ -541,6 +545,7 @@ export default {
       } else if (val < this.localData.exerciseNames.length) {
         this.localData.exerciseNames.splice(val);
       }
+      this.generateStepsFromSettings();
     },
   },
 
