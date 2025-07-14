@@ -65,4 +65,18 @@ describe('ProgramTimer', () => {
     expect(wrapper.vm.timer_halted).toBe(true)
     expect(wrapper.vm.progress).toBe(0)
   })
+
+  it('generates program steps from settings', () => {
+    wrapper.vm.localData.action.value = 2
+    wrapper.vm.localData.break.value = 1
+    wrapper.vm.localData.exercises.value = 2
+    wrapper.vm.localData.rounds.value = 1
+    wrapper.vm.localData.round_break.value = 0
+    wrapper.vm.generateStepsFromSettings()
+    expect(store.programSteps).toEqual([
+      { type: 'action', duration: 2, repetitions: 1 },
+      { type: 'break', duration: 1, repetitions: 1 },
+      { type: 'action', duration: 2, repetitions: 1 }
+    ])
+  })
 })

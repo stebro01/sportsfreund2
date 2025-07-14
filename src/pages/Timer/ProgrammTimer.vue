@@ -349,7 +349,7 @@ export default {
       if (Array.isArray(data)) {
         if (data.length && data[0]._check !== undefined) {
           data.forEach(time => {
-            if (time._check === false) total += time.value + 1
+            if (time._check === false) total += time.value
           })
           total -= this.progress
         } else {
@@ -359,9 +359,9 @@ export default {
         }
       } else {
         const { action, break: _break, exercises, rounds, round_break } = data
-        const action_time = (action.value + 1) * exercises.value * rounds.value
-        const break_time = (_break.value + 1) * (exercises.value - 1) * rounds.value
-        const round_break_time = (round_break.value + 1) * (rounds.value - 1)
+        const action_time = action.value * exercises.value * rounds.value
+        const break_time = _break.value * (exercises.value - 1) * rounds.value
+        const round_break_time = round_break.value * (rounds.value - 1)
         total = action_time + break_time + round_break_time
       }
       return total
@@ -464,6 +464,23 @@ export default {
       this.store.removeProgramStep(index)
     },
 
+    generateStepsFromSettings() {
+      const steps = []
+      const { action, break: brk, exercises, rounds, round_break } = this.localData
+      for (let r = 0; r < rounds.value; r++) {
+        for (let e = 0; e < exercises.value; e++) {
+          steps.push({ type: 'action', duration: action.value, repetitions: 1 })
+          if (e < exercises.value - 1) {
+            steps.push({ type: 'break', duration: brk.value, repetitions: 1 })
+          }
+        }
+        if (r < rounds.value - 1) {
+          steps.push({ type: 'round_break', duration: round_break.value, repetitions: 1 })
+        }
+      }
+      this.store.PROGRAM_STEPS = steps
+    },
+
     onDragStart(idx) {
       this.dragIndex = idx
     },
@@ -478,6 +495,7 @@ export default {
     async startTimer() {
       this.timer_finished = false
       this.timer_halted = false
+      this.generateStepsFromSettings()
       this.TIME_DATA = this._prepareTimer() // prepare an array with the times
       // COUNT DOWN 1s
       playSound('beepbeepbeep_1s', this.store.settings.audio_playback)
