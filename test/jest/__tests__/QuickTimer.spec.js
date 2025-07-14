@@ -56,4 +56,11 @@ describe('QuickTimer', () => {
     expect(wrapper.vm.timer_finished).toBe(false)
     expect(wrapper.vm.progress).toBe(0)
   })
+
+  it('updates step size when timer exceeds 60 seconds', () => {
+    wrapper.vm.time = 55
+    expect(wrapper.vm.bigStep).toBe(5)
+    wrapper.vm.time = 65
+    expect(wrapper.vm.bigStep).toBe(10)
+  })
 })
