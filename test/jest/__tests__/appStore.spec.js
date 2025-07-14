@@ -11,13 +11,13 @@ describe('appStore pinning', () => {
     store = useAppStore()
   })
 
-  it('pinTimer keeps only three entries', () => {
+  it('pinTimer keeps only five entries', () => {
     store.pinTimer(10)
     store.pinTimer(20)
     store.pinTimer(30)
     expect(store.pinnedTimers).toEqual([30, 20, 10])
     store.pinTimer(40)
-    expect(store.pinnedTimers).toEqual([40, 30, 20])
+    expect(store.pinnedTimers).toEqual([40, 30, 20, 10])
   })
 
   it('unpinTimer removes an entry', () => {

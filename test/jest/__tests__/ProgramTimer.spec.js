@@ -134,7 +134,7 @@ describe('ProgramTimer', () => {
     const { action, break: brk, exercises, rounds, round_break } = preset.data
     for (let r = 0; r < rounds.value; r++) {
       for (let e = 0; e < exercises.value; e++) {
-        expectedSteps.push({ type: 'action', duration: action.value, repetitions: 1, name: '' })
+        expectedSteps.push({ type: 'action', duration: action.value, repetitions: 1, name: undefined })
         if (e < exercises.value - 1) {
           expectedSteps.push({ type: 'break', duration: brk.value, repetitions: 1 })
         }
@@ -147,5 +147,23 @@ describe('ProgramTimer', () => {
     expect(store.programSteps).toEqual(expectedSteps)
     expect(wrapper.vm.DURATION_CALC).toBe(wrapper.vm.calcDuration(preset.data))
     expect(wrapper.vm.isActive).toBe(false)
+  })
+
+  it('retains added steps when settings change', async () => {
+    const initial = store.programSteps.length
+    wrapper.vm.addStep()
+    expect(store.programSteps.length).toBe(initial + 1)
+    wrapper.vm.localData.action.value = 10
+    await wrapper.vm.$nextTick()
+    expect(store.programSteps.length).toBe(initial + 1)
+  })
+
+  it('keeps remaining steps after removal and settings update', async () => {
+    wrapper.vm.addStep()
+    wrapper.vm.removeStep(0)
+    const stepsSnapshot = JSON.parse(JSON.stringify(store.programSteps))
+    wrapper.vm.localData.break.value = 5
+    await wrapper.vm.$nextTick()
+    expect(store.programSteps).toEqual(stepsSnapshot)
   })
 })

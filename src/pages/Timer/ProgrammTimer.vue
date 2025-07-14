@@ -344,7 +344,9 @@ export default {
     localData: {
       deep: true,
       handler () {
-        this.generateStepsFromSettings()
+        if (this.programSteps.length === 0) {
+          this.generateStepsFromSettings()
+        }
       }
     },
     'localData.exercises.value'(val) {
@@ -427,6 +429,7 @@ export default {
         this.localData.rounds.value = preset.data.rounds.value
         this.localData.round_break.value = preset.data.round_break.value
         this.localData.label = preset.label
+        this.generateStepsFromSettings()
       }
     },
 
