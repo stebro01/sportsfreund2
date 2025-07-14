@@ -134,6 +134,7 @@
                     v-model="localData.action.value"
                     :min="5"
                     :max="3600"
+                    :step="5"
                   />
                 </q-card-section>
               </q-card>
@@ -159,6 +160,7 @@
                     v-model="localData.break.value"
                     :min="0"
                     :max="3600"
+                    :step="5"
                   />
                 </q-card-section>
               </q-card>
@@ -256,6 +258,7 @@
                     v-model="localData.round_break.value"
                     :min="0"
                     :max="3600"
+                    :step="5"
                   />
                 </q-card-section>
               </q-card>
@@ -299,6 +302,7 @@
                       v-model="step.duration"
                       :min="1"
                       :max="3600"
+                      :step="5"
                     />
                   </q-card-section>
                 </q-card>

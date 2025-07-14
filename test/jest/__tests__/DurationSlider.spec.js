@@ -6,9 +6,9 @@ import DurationSlider from "components/DurationSlider.vue";
 installQuasarPlugin();
 
 describe("DurationSlider", () => {
-  function mountSlider(value) {
+  function mountSlider(value, props = {}) {
     return shallowMount(DurationSlider, {
-      props: { modelValue: value },
+      props: { modelValue: value, ...props },
       global: {
         stubs: {
           "q-slider": true,
@@ -30,5 +30,10 @@ describe("DurationSlider", () => {
     const wrapper = mountSlider(75);
     expect(wrapper.vm.labelValue).toBe("1m 15s");
     expect(wrapper.vm.step).toBe(10);
+  });
+
+  it("uses provided step prop", () => {
+    const wrapper = mountSlider(120, { step: 1 });
+    expect(wrapper.vm.step).toBe(1);
   });
 });
