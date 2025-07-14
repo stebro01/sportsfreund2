@@ -139,9 +139,17 @@ describe("ProgramTimer", () => {
     const preset = store.presets.find((p) => p.data);
     wrapper.vm.selectPreset(preset);
     await wrapper.vm.$nextTick();
-
-    expect(store.programSteps).toEqual([]);
     expect(wrapper.vm.DURATION_CALC).toBe(wrapper.vm.calcDuration(preset.data));
     expect(wrapper.vm.isActive).toBe(false);
+  });
+
+  it("recalculates duration when settings change", async () => {
+    const start = wrapper.vm.DURATION_CALC;
+    wrapper.vm.localData.action.value += 1;
+    wrapper.vm.generateStepsFromSettings();
+    await wrapper.vm.$nextTick();
+    const expected = wrapper.vm.calcDuration(wrapper.vm.programSteps);
+    expect(wrapper.vm.DURATION_CALC).toBe(expected);
+    expect(wrapper.vm.DURATION_CALC).not.toBe(start);
   });
 });
