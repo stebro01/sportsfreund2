@@ -99,6 +99,12 @@
                   <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
                     thumb-size="50px" :step="1" :min="1" :max="50" />
                 </q-card-section>
+                <q-card-section v-if="localData.exercises.value > 1">
+                  <div class="q-gutter-sm">
+                    <q-input v-for="n in localData.exercises.value" :key="'name'+n" dense type="text"
+                      :label="'Übung ' + n" v-model="localData.exerciseNames[n-1]" />
+                  </div>
+                </q-card-section>
               </q-card>
             </q-popup-proxy>
           </q-item>
@@ -173,7 +179,7 @@
             <div v-if="!timer_halted">
               <div>
                 {{ formatTime(TIMER_VALUE) }}
-                <q-tooltip>{{ TIME_DATA[TIME_IND] }}</q-tooltip>
+                <q-tooltip v-if="TIME_DATA[TIME_IND].name">{{ TIME_DATA[TIME_IND].name }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
@@ -232,7 +238,10 @@ export default {
     return {
       timer_finished: false,
       timer_halted: false,
-      localData: JSON.parse(JSON.stringify(this.store.lastPreset)),
+      localData: {
+        ...JSON.parse(JSON.stringify(this.store.lastPreset)),
+        exerciseNames: (this.store.lastPreset.exerciseNames || [])
+      },
       // progress state handled by composable
       TIME_DATA: undefined,
       TIME_IND: undefined,
@@ -336,6 +345,15 @@ export default {
       deep: true,
       handler () {
         this.generateStepsFromSettings()
+      }
+    },
+    'localData.exercises.value'(val) {
+      if (val > this.localData.exerciseNames.length) {
+        for (let i = this.localData.exerciseNames.length; i < val; i++) {
+          this.localData.exerciseNames.push('')
+        }
+      } else if (val < this.localData.exerciseNames.length) {
+        this.localData.exerciseNames.splice(val)
       }
     }
   },
@@ -475,10 +493,10 @@ export default {
 
     generateStepsFromSettings() {
       const steps = []
-      const { action, break: brk, exercises, rounds, round_break } = this.localData
+      const { action, break: brk, exercises, rounds, round_break, exerciseNames } = this.localData
       for (let r = 0; r < rounds.value; r++) {
         for (let e = 0; e < exercises.value; e++) {
-          steps.push({ type: 'action', duration: action.value, repetitions: 1 })
+          steps.push({ type: 'action', duration: action.value, repetitions: 1, name: exerciseNames[e] })
           if (e < exercises.value - 1) {
             steps.push({ type: 'break', duration: brk.value, repetitions: 1 })
           }
@@ -563,6 +581,7 @@ export default {
           times.push({
             type: step.type,
             value: step.duration,
+            name: step.name,
             step_ind: stepInd,
             rep_ind: i,
             _check: false

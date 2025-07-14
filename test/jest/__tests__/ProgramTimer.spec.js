@@ -73,12 +73,21 @@ describe('ProgramTimer', () => {
     wrapper.vm.localData.exercises.value = 2
     wrapper.vm.localData.rounds.value = 1
     wrapper.vm.localData.round_break.value = 0
+    wrapper.vm.localData.exerciseNames = ['a', 'b']
     wrapper.vm.generateStepsFromSettings()
     expect(store.programSteps).toEqual([
-      { type: 'action', duration: 2, repetitions: 1 },
+      { type: 'action', duration: 2, repetitions: 1, name: 'a' },
       { type: 'break', duration: 1, repetitions: 1 },
-      { type: 'action', duration: 2, repetitions: 1 }
+      { type: 'action', duration: 2, repetitions: 1, name: 'b' }
     ])
+  })
+
+  it('prepares timer data including names', () => {
+    store.PROGRAM_STEPS = [
+      { type: 'action', duration: 1, repetitions: 1, name: 'x' }
+    ]
+    const times = wrapper.vm._prepareTimer()
+    expect(times[0].name).toBe('x')
   })
 
   it('uses last preset duration when no program steps exist on mount', () => {
@@ -125,7 +134,7 @@ describe('ProgramTimer', () => {
     const { action, break: brk, exercises, rounds, round_break } = preset.data
     for (let r = 0; r < rounds.value; r++) {
       for (let e = 0; e < exercises.value; e++) {
-        expectedSteps.push({ type: 'action', duration: action.value, repetitions: 1 })
+        expectedSteps.push({ type: 'action', duration: action.value, repetitions: 1, name: '' })
         if (e < exercises.value - 1) {
           expectedSteps.push({ type: 'break', duration: brk.value, repetitions: 1 })
         }
