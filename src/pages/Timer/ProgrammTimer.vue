@@ -27,9 +27,9 @@
       </div>
 
       <!-- OPTIONS -->
-      <div v-if="!isActive && timer_halted === false" class="col row justify-center">
+      <div v-if="!isActive && timer_halted === false" class="col">
         <!-- STEUER ELEMENTE -->
-        <q-list class="" style="max-width: 400px; min-width: 350px">
+        <q-row class="q-col-gutter-sm justify-center" style="max-width: 400px; min-width: 300px">
           <!-- SELECTION / PREVIOUS -->
           <q-item clickable v-ripple class="q-ma-sm">
             <q-item-section avatar><q-icon name="today" /></q-item-section>
@@ -55,45 +55,42 @@
           </q-item>
 
           <!-- Action -->
-          <q-item clickable v-ripple class="my-action-item q-ma-sm">
-            <q-item-section avatar><q-icon name="play_circle" /></q-item-section>
-            <q-item-section class="text-white">Action</q-item-section>
-            <q-item-section side class="text-positive">{{ formatTime(localData.action.value) }}</q-item-section>
-            <q-popup-proxy>
+          <q-col cols="12">
+            <q-btn class="full-width my-main-btn" @click="showActionDialog = true">
+              <q-icon name="play_circle" class="q-mr-sm" />Action: {{ formatTime(localData.action.value) }}
+            </q-btn>
+            <q-dialog v-model="showActionDialog">
               <q-card class="my-popup-card text-center shadow-1">
-                <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Action anpassen</q-card-section>
                 <q-card-section>
                   <DurationSlider v-model="localData.action.value" :min="5" :max="3600" />
                 </q-card-section>
               </q-card>
-            </q-popup-proxy>
-          </q-item>
+            </q-dialog>
+          </q-col>
 
           <!-- Pause -->
-          <q-item clickable v-ripple class="my-pause-item q-ma-sm">
-            <q-item-section avatar><q-icon name="pause_circle" /></q-item-section>
-            <q-item-section class="text-white">Pause</q-item-section>
-            <q-item-section side class="text-red">{{ formatTime(localData.break.value) }}</q-item-section>
-            <q-popup-proxy>
+          <q-col cols="12">
+            <q-btn class="full-width my-main-btn" color="negative" @click="showBreakDialog = true">
+              <q-icon name="pause_circle" class="q-mr-sm" />Pause: {{ formatTime(localData.break.value) }}
+            </q-btn>
+            <q-dialog v-model="showBreakDialog">
               <q-card class="my-popup-card text-center shadow-1">
-                <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Pause anpassen</q-card-section>
                 <q-card-section>
                   <DurationSlider v-model="localData.break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
-            </q-popup-proxy>
-          </q-item>
+            </q-dialog>
+          </q-col>
 
           <!-- Excercises -->
-          <q-item clickable v-ripple class="q-ma-sm bg-grey-10">
-            <q-item-section avatar><q-icon name="fitness_center" /></q-item-section>
-            <q-item-section>Übungen</q-item-section>
-            <q-item-section side>{{ localData.exercises.value }} {{ localData.exercises.unit }} </q-item-section>
-            <q-popup-proxy>
+          <q-col cols="12">
+            <q-btn class="full-width my-main-btn" color="secondary" @click="showExerciseDialog = true">
+              <q-icon name="fitness_center" class="q-mr-sm" />Übungen: {{ localData.exercises.value }} {{ localData.exercises.unit }}
+            </q-btn>
+            <q-dialog v-model="showExerciseDialog">
               <q-card class="my-popup-card text-center shadow-1">
-                <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Übungen anpassen</q-card-section>
                 <q-card-section>
                   <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
@@ -106,41 +103,39 @@
                   </div>
                 </q-card-section>
               </q-card>
-            </q-popup-proxy>
-          </q-item>
+            </q-dialog>
+          </q-col>
 
           <!-- Repetitions -->
-          <q-item clickable v-ripple class="q-ma-sm bg-grey-10">
-            <q-item-section avatar><q-icon name="restart_alt" /></q-item-section>
-            <q-item-section>Wiederholungen</q-item-section>
-            <q-item-section side>{{ localData.rounds.value }} {{ localData.rounds.unit }}</q-item-section>
-            <q-popup-proxy>
+          <q-col cols="12">
+            <q-btn class="full-width my-main-btn" color="secondary" @click="showRoundsDialog = true">
+              <q-icon name="restart_alt" class="q-mr-sm" />Wiederholungen: {{ localData.rounds.value }} {{ localData.rounds.unit }}
+            </q-btn>
+            <q-dialog v-model="showRoundsDialog">
               <q-card class="my-popup-card text-center shadow-1">
-                <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Wiederholungen anpassen</q-card-section>
                 <q-card-section>
                   <q-slider v-model="localData.rounds.value" label label-text-color="dark" color="white" thumb-size="50px"
                     :step="1" :min="1" :max="50" />
                 </q-card-section>
               </q-card>
-            </q-popup-proxy>
-          </q-item>
+            </q-dialog>
+          </q-col>
 
           <!-- BREAKS -->
-          <q-item clickable v-ripple class="q-ma-sm my-pause-item">
-            <q-item-section avatar><q-icon name="restore" /></q-item-section>
-            <q-item-section class="text-white">Rundenpause</q-item-section>
-            <q-item-section side class="text-red">{{ formatTime(localData.round_break.value) }}</q-item-section>
-            <q-popup-proxy>
+          <q-col cols="12">
+            <q-btn class="full-width my-main-btn" color="negative" @click="showRoundBreakDialog = true">
+              <q-icon name="restore" class="q-mr-sm" />Rundenpause: {{ formatTime(localData.round_break.value) }}
+            </q-btn>
+            <q-dialog v-model="showRoundBreakDialog">
               <q-card class="my-popup-card text-center shadow-1">
-                <q-btn icon="clear" flat round class="absolute-top-right z-top" v-close-popup />
                 <q-card-section>Rundenpause anpassen</q-card-section>
                 <q-card-section>
                   <DurationSlider v-model="localData.round_break.value" :min="0" :max="3600" />
                 </q-card-section>
               </q-card>
-            </q-popup-proxy>
-          </q-item>
+            </q-dialog>
+          </q-col>
 
 
           <q-separator class="q-my-md" />
@@ -157,7 +152,7 @@
               <q-btn flat icon="delete" @click.stop="removeStep(idx)" />
             </q-item-section>
           </q-item>
-        </q-list>
+        </q-row>
 
 
       </div>
@@ -242,7 +237,12 @@ export default {
       TIME_DATA: undefined,
       TIME_IND: undefined,
       label_new_preset: 'Neues Programm',
-      dragIndex: null
+      dragIndex: null,
+      showActionDialog: false,
+      showBreakDialog: false,
+      showExerciseDialog: false,
+      showRoundsDialog: false,
+      showRoundBreakDialog: false
 
     }
   },
