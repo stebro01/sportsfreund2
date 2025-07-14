@@ -1,20 +1,20 @@
 <template>
   <q-page data-cy="page_about" class="full-height">
     <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
-    <q-btn :icon="!$store.getters.SETTINGS.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+    <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
       class="absolute-top-left"
-      @click="$store.commit('SET_SETTINGS_AUDIO_PLAYBACK', !$store.getters.SETTINGS.audio_playback)" />
+      @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     <div class="column text-center" style="height: 100vh; width: 100vw">
       <div class="col-1">Program</div>
       <!-- TIMER ELEMENT -->
       <!-- BTN -->
       <div class="col-2">
-        <MY_ITEM_BTN v-if="!interval && timer_halted === false" :label="'START'" :icon="'play_arrow'"
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === false" :label="'START'" :icon="'play_arrow'"
           @clicked="startTimer()" />
-        <MY_ITEM_BTN v-if="!interval && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
           @clicked="clearTimer()" />
-        <MY_ITEM_BTN v-if="interval && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
-        <MY_ITEM_BTN v-if="interval && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="isActive && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
+        <MY_ITEM_BTN v-if="isActive && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
       </div>
 
       <!-- DURATION -->
@@ -27,7 +27,7 @@
       </div>
 
       <!-- OPTIONS -->
-      <div v-if="interval === undefined && timer_halted === false" class="col row justify-center">
+      <div v-if="!isActive && timer_halted === false" class="col row justify-center">
         <!-- STEUER ELEMENTE -->
         <q-list class="" style="max-width: 400px; min-width: 350px">
           <!-- SELECTION / PREVIOUS -->
@@ -140,6 +140,24 @@
           </q-item>
 
 
+          <q-separator class="q-my-md" />
+          <q-item class="q-ma-sm" clickable @click="addStep">
+            <q-item-section avatar><q-icon name="add" /></q-item-section>
+            <q-item-section>Schritt hinzufügen</q-item-section>
+          </q-item>
+          <q-item v-for="(step, idx) in programSteps" :key="'step'+idx" class="q-ma-sm bg-grey-9" draggable
+            @dragstart="onDragStart(idx)" @dragover.prevent @drop="onDrop(idx)">
+            <q-item-section avatar>
+              <q-select dense emit-value map-options :options="STEP_OPTIONS" v-model="step.type" />
+            </q-item-section>
+            <q-item-section>
+              <q-slider v-model="step.duration" color="white" label label-text-color="dark" thumb-size="40px" :min="1" :max="300" />
+            </q-item-section>
+            <q-item-section side>
+              <q-input v-model.number="step.repetitions" type="number" dense style="width:50px" />
+              <q-btn flat icon="delete" @click.stop="removeStep(idx)" />
+            </q-item-section>
+          </q-item>
         </q-list>
 
 
@@ -171,8 +189,8 @@
         </q-knob>
 
         <div v-if="TIME_DATA && TIME_DATA[TIME_IND] && !timer_halted">
-          <q-chip>Übung: {{ TIME_DATA[TIME_IND].ind + 1 }} / {{ localData.exercises.value }}</q-chip>
-          <q-chip>Runde: {{ TIME_DATA[TIME_IND].round_ind + 1 }} / {{ localData.rounds.value }}</q-chip>
+          <q-chip>Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} / {{ programSteps.length }}</q-chip>
+          <q-chip>Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} / {{ programSteps[TIME_DATA[TIME_IND].step_ind].repetitions || 1 }}</q-chip>
         </div>
         <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND] && timer_halted">
           <MY_ITEM_BTN :label="'WEITER'" :icon="'play_arrow'" @clicked="proceedTimer()" />
@@ -197,35 +215,56 @@
 <script>
 import MY_ITEM_BTN from 'components/MyItemBtn.vue'
 import getRandomCitation from 'src/tools/citate.js'
+import { useAppStore } from 'stores/appStore'
+import playSound from 'src/tools/sound.js'
+import useTimer from 'src/composables/useTimer'
 
 export default {
   name: 'ProgrammTimer',
   components: {
     MY_ITEM_BTN
   },
+  setup () {
+    const store = useAppStore()
+    const { start: startInterval, stop: stopInterval, progress, isActive } = useTimer()
+    return { store, startInterval, stopInterval, progress, isActive }
+  },
   data() {
     return {
-      interval: undefined,
       timer_finished: false,
       timer_halted: false,
-      localData: JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET)),
-      value: 0,
+      localData: JSON.parse(JSON.stringify(this.store.lastPreset)),
+      // progress state handled by composable
       TIME_DATA: undefined,
       TIME_IND: undefined,
-      label_new_preset: 'Neues Programm'
+      label_new_preset: 'Neues Programm',
+      dragIndex: null
 
     }
   },
   mounted() {
-
+    if (this.programSteps.length === 0) {
+      this.addStep()
+    }
   },
 
   computed: {
+    programSteps() {
+      return this.store.programSteps
+    },
+
+    STEP_OPTIONS() {
+      return [
+        { label: 'Action', value: 'action' },
+        { label: 'Pause', value: 'break' },
+        { label: 'Rundenpause', value: 'round_break' }
+      ]
+    },
     TIMER_VALUE() {
       if (!this.TIME_DATA) return 0
       // return the value of the current timer as difference from value and the current time
       const currentTimer = this.TIME_DATA[this.TIME_IND]
-      return currentTimer.value - this.value
+      return currentTimer.value - this.progress
     },
 
     TIMER_PERCENTAGE() {
@@ -233,7 +272,7 @@ export default {
       // return the value of the current timer as difference from value and the current time
       const currentTimer = this.TIME_DATA[this.TIME_IND]
       if (!currentTimer) return 0
-      return this.value / currentTimer.value * 100
+      return this.progress / currentTimer.value * 100
     },
 
     TIMER_TYPE() {
@@ -274,12 +313,12 @@ export default {
 
     DURATION_CALC() {
       if (this.TIME_DATA) return this.calcDuration(this.TIME_DATA)
-      else return this.calcDuration(this.localData)
+      else return this.calcDuration(this.programSteps)
 
     },
 
     PRESETS() {
-      return this.$store.getters.PRESETS
+      return this.store.presets
     },
 
     PRESET_LABEL() {
@@ -294,7 +333,7 @@ export default {
 
   methods: {
     goBack() {
-      if (this.interval) clearInterval(this.interval)
+      this.stopInterval(false)
       this.$router.go(-1)
     },
 
@@ -306,25 +345,30 @@ export default {
     },
 
     calcDuration(data) {
-      var total = 0 // in seconds
-      if (!Array.isArray(data)) {
+      let total = 0 // in seconds
+      if (Array.isArray(data)) {
+        if (data.length && data[0]._check !== undefined) {
+          data.forEach(time => {
+            if (time._check === false) total += time.value + 1
+          })
+          total -= this.progress
+        } else {
+          data.forEach(step => {
+            total += (step.duration) * (step.repetitions || 1)
+          })
+        }
+      } else {
         const { action, break: _break, exercises, rounds, round_break } = data
         const action_time = (action.value + 1) * exercises.value * rounds.value
         const break_time = (_break.value + 1) * (exercises.value - 1) * rounds.value
         const round_break_time = (round_break.value + 1) * (rounds.value - 1)
-        var total = action_time + break_time + round_break_time
-      } else {
-        data.forEach(time => {
-          if (time._check === false) total += time.value + 1
-        })
-        total -= this.value
+        total = action_time + break_time + round_break_time
       }
-
       return total
     },
 
     addPreset() {
-      this.localData = JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET))
+      this.localData = JSON.parse(JSON.stringify(this.store.lastPreset))
       this.localData.label = this.label_new_preset
     },
 
@@ -338,7 +382,7 @@ export default {
         dark: true
       }).onOk(() => {
         // remove preset
-        this.$store.commit('REMOVE_PRESET', label)
+        this.store.removePreset(label)
         this.localData.label = 'Letztes Programm'
       })
 
@@ -347,7 +391,7 @@ export default {
     selectPreset(preset) {
       if (preset.data === undefined) {
         // load last workout
-        this.localData = JSON.parse(JSON.stringify(this.$store.getters.LAST_PRESET))
+        this.localData = JSON.parse(JSON.stringify(this.store.lastPreset))
         return
       } else {
         this.localData.action.value = preset.data.action.value
@@ -373,7 +417,7 @@ export default {
       }).onOk(data => {
         // save preset
         // check if name already exists
-        const preset_exists = this.$store.getters.PRESETS.find(preset => preset.label === data)
+        const preset_exists = this.store.presets.find(preset => preset.label === data)
         if (data === this.label_new_preset || preset_exists) {
           return this.$q.notify({
             message: 'Bitte einen anderen Namen eingeben',
@@ -404,7 +448,7 @@ export default {
             }
           }
         }
-        this.$store.commit('ADD_PRESET', new_preset)
+        this.store.addPreset(new_preset)
 
 
       })
@@ -412,17 +456,34 @@ export default {
 
     },
 
+    addStep() {
+      this.store.addProgramStep({ type: 'action', duration: 30, repetitions: 1 })
+    },
+
+    removeStep(index) {
+      this.store.removeProgramStep(index)
+    },
+
+    onDragStart(idx) {
+      this.dragIndex = idx
+    },
+
+    onDrop(idx) {
+      if (this.dragIndex === null) return
+      this.store.moveProgramStep(this.dragIndex, idx)
+      this.dragIndex = null
+    },
+
     // TIMER
     async startTimer() {
       this.timer_finished = false
       this.timer_halted = false
       this.TIME_DATA = this._prepareTimer() // prepare an array with the times
-      this.interval = true
       // COUNT DOWN 1s
-      this.playSound('beepbeepbeep_1s')
+      playSound('beepbeepbeep_1s', this.store.settings.audio_playback)
       await this.delay(1500)
 
-      this.$store.commit('SET_LAST_PRESET', JSON.parse(JSON.stringify(this.localData)))
+      this.store.setLastPreset(JSON.parse(JSON.stringify(this.localData)))
 
       // start timer
       this.nextTimer()
@@ -438,60 +499,55 @@ export default {
       // if no timer is left, stop
       if (this.TIME_IND === -1) {
         this.timer_finished = true
-        this.value = 0
-        this.playSound('tada')
+        this.progress = 0
+        playSound('tada', this.store.settings.audio_playback)
         return
       } // else
 
       const nextTimer = this.TIME_DATA[this.TIME_IND]
 
-      this.value = VALUE || 0
+      this.progress = VALUE || 0
       // now start the intervall with ticks of 1s
-      this.interval = setInterval(() => {
+      this.startInterval(() => {
         // check if timer is finished
-        if (this.value + 1 === nextTimer.value) this.playSound('beep_1s')
-        if (this.value >= nextTimer.value) {
+        if (this.progress === nextTimer.value - 1) playSound('beep_1s', this.store.settings.audio_playback)
+        if (this.progress >= nextTimer.value) {
 
           // set _check to true
           nextTimer._check = true
           // stop timer
-          clearInterval(this.interval)
+          this.stopInterval()
           // start next timer
           this.nextTimer()
-        } else {
-          // increase value
-          this.value++
         }
-      }, 1000)
+      })
     },
 
     proceedTimer() {
       this.timer_halted = false
-      this.nextTimer(this.value)
+      this.nextTimer(this.progress)
     },
 
     _prepareTimer() {
-      //prepare an array with the times
       const times = []
-      for (let round_i = 0; round_i < this.localData.rounds.value; round_i++) {
-        for (let i = 0; i < this.localData.exercises.value; i++) {
-          times.push({ type: 'action', value: this.localData.action.value, ind: i, round_ind: round_i, _check: false })
-          times.push({ type: 'break', value: this.localData.break.value, ind: i, round_ind: round_i, _check: false })
+      this.programSteps.forEach((step, stepInd) => {
+        const reps = step.repetitions || 1
+        for (let i = 0; i < reps; i++) {
+          times.push({
+            type: step.type,
+            value: step.duration,
+            step_ind: stepInd,
+            rep_ind: i,
+            _check: false
+          })
         }
-        if (round_i < this.localData.rounds.value - 1) {
-          times.pop() // remove last element, because it is a break
-          times.push({ type: 'round_break', value: this.localData.round_break.value, ind: 0, round_ind: round_i, _check: false })
-        }
-      }
-      // remove last element, because it is a break
-      times.pop()
+      })
       return times
     },
 
     stopTimer() {
       // stopp the timer / intervall
-      clearInterval(this.interval)
-      this.interval = undefined
+      this.stopInterval()
       this.timer_finished = false
       this.timer_halted = true
     },
@@ -500,36 +556,12 @@ export default {
       // clear the timer
       this.stopTimer()
       this.TIME_DATA = undefined
-      this.value = 0
+      this.progress = 0
       this.timer_halted = false
       this.timer_finished = false
     },
 
 
-    // SOUNDS
-    playSound(item) {
-      if (!this.$store.getters.SETTINGS.audio_playback) return
-      if (this.$q.platform.is.cordova) {
-        var path = cordova.file.applicationDirectory + "www/media/" + item + ".wav";
-
-        var myMedia = new Media(path,
-          function () {
-            console.log("Audio Success");
-          },
-          function (err) {
-            console.log("Audio Error: " + err.code);
-          }
-        );
-
-
-        myMedia.play()
-        return
-      } else {
-        var audio = new Audio(require(`assets/sounds/${item}.wav`))
-        audio.play({ playAudioWhenScreenIsLocked: true })
-        return
-      }
-    },
 
     // SOME HELPER
 

@@ -5,10 +5,10 @@
         <q-icon class="cursor-pointer" name="img:icons/favicon-96x96.png" size="sm"
           @click="leftDrawerOpen = !leftDrawerOpen" />
         <q-toolbar-title class="text-center no-pointer-events">
-          {{ $store.getters.ENV.APP_NAME }}
+          {{ store.env.APP_NAME }}
         </q-toolbar-title>
 
-        <div class="no-pointer-events">{{ $store.getters.ENV.APP_VERSION }}</div>
+        <div class="no-pointer-events">{{ store.env.APP_VERSION }}</div>
       </q-toolbar>
     </q-header>
 
@@ -36,20 +36,25 @@
 
 <script>
 import EssentialLink from 'components/EssentialLink.vue'
+import { useAppStore } from 'stores/appStore'
 
 export default {
   name: 'MainLayout',
   components: {
     EssentialLink
   },
+  setup () {
+    const store = useAppStore()
+    return { store }
+  },
   mounted() {
-    this.$store.commit('LOG', 'MainLayout.vue::mounted()')
+    this.store.log('MainLayout.vue::mounted()')
   },
   data() {
     return {
       toggleLeftDrawer: false,
       leftDrawerOpen: false,
-      essentialLinks: this.$store.getters.ESSENTIAL_LINKS
+      essentialLinks: this.store.getEssentialLinks
     }
   },
   computed: {
