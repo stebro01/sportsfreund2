@@ -35,6 +35,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  step: {
+    type: Number,
+    default: undefined,
+  },
   min: {
     type: Number,
     default: 0,
@@ -60,7 +64,7 @@ watch(proxyValue, (val) => {
   emit("update:modelValue", val);
 });
 
-const step = computed(() => (proxyValue.value < 60 ? 5 : 10));
+const step = computed(() => props.step ?? (proxyValue.value < 60 ? 5 : 10));
 
 const labelValue = computed(() => {
   const val = proxyValue.value;
