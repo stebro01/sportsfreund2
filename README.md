@@ -1,42 +1,34 @@
-# Quasar App (sportsfreund2)
+# Sportsfreund Timer App
 
-A Quasar Project
+A Quasar/Vue 3 timer application for organizing workouts. The app offers Quick Timer and Program Timer modes and lets you invite friends to share sessions.
 
-## Install the dependencies
+## Project setup
+Install dependencies using npm or yarn:
+
 ```bash
-yarn
-# or
 npm install
+# or
+yarn
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+### Development server
+Run the dev server with hot reloading:
+
 ```bash
 quasar dev
 ```
 
+### Build for production
+Create an optimized build:
 
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-
-### Build the app for production
 ```bash
 quasar build
 ```
 
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js).
-# sportsfreund2
+### Unit tests
+Execute unit tests with:
+
+```bash
+npm run test:unit
+```
+
