@@ -78,6 +78,16 @@ export const useProgramStore = defineStore("program", {
       );
       localStorage.setItem("presets", JSON.stringify(this.PRESETS));
     },
+    updatePreset(label, data) {
+      const target = label.trim().toLowerCase();
+      const preset = this.PRESETS.find(
+        (p) => p.label.trim().toLowerCase() === target
+      );
+      if (preset) {
+        preset.data = JSON.parse(JSON.stringify(data));
+        localStorage.setItem("presets", JSON.stringify(this.PRESETS));
+      }
+    },
     removeProgramStep(index) {
       this.PROGRAM_STEPS.splice(index, 1);
     },
