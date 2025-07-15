@@ -1,50 +1,19 @@
 <template>
   <q-page data-cy="page_about" class="full-height">
-    <q-btn
-      icon="close"
-      size="lg"
-      flat
-      round
-      class="absolute-top-right"
-      @click="goBack()"
-    />
-    <q-btn
-      :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'"
-      size="lg"
-      flat
-      round
-      class="absolute-top-left"
-      @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)"
-    />
+    <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
+    <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+      class="absolute-top-left" @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     <div class="column text-center" style="height: 100vh; width: 100vw">
       <div class="col-1">Program</div>
       <!-- TIMER ELEMENT -->
       <!-- BTN -->
       <div class="col-2">
-        <MY_ITEM_BTN
-          v-if="!isActive && timer_halted === false"
-          :label="'START'"
-          :icon="'play_arrow'"
-          @clicked="startTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="!isActive && timer_halted === true"
-          :label="'ABBRECHEN'"
-          :icon="'close'"
-          @clicked="clearTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="isActive && !timer_finished"
-          :label="'STOP'"
-          :icon="'stop'"
-          @clicked="stopTimer()"
-        />
-        <MY_ITEM_BTN
-          v-if="isActive && timer_finished"
-          :label="'ZURÜCK'"
-          :icon="'arrow_back'"
-          @clicked="clearTimer()"
-        />
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === false" :label="'START'" :icon="'play_arrow'"
+          @clicked="startTimer()" />
+        <MY_ITEM_BTN v-if="!isActive && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
+          @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="isActive && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
+        <MY_ITEM_BTN v-if="isActive && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
       </div>
 
       <!-- DURATION -->
@@ -57,12 +26,9 @@
       </div>
 
       <!-- OPTIONS -->
-      <div v-if="!isActive && timer_halted === false" class="col">
+      <div v-if="!isActive && timer_halted === false" class="row justify-center">
         <!-- STEUER ELEMENTE -->
-        <div
-          class="row q-gutter-y-sm justify-center"
-          style="width: 100vw; max-width: 1000px"
-        >
+        <div class="row q-gutter-y-md" style="width: 100vw; max-width: 1000px">
           <!-- SELECTION / PREVIOUS -->
           <div class="col-12">
             <q-item clickable v-ripple class="q-ma-sm">
@@ -71,33 +37,15 @@
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
                 }}</q-btn>
-                <ProgramSelectDialog
-                  v-model="showPresetDialog"
-                  :current-settings="localData"
-                  @select="selectPreset"
-                />
+                <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
-              <q-item-section side v-if="localData.label === label_new_preset"
-                ><q-btn
-                  flat
-                  icon="save"
-                  @click="saveNewPreset()"
-                  color="white"
-                ></q-btn
-              ></q-item-section>
-              <q-item-section
-                side
-                v-else-if="
-                  localData.label !== label_new_preset &&
-                  localData.label !== 'Default'
-                "
-                ><q-btn
-                  flat
-                  icon="delete"
-                  @click="removePreset(this.localData.label)"
-                  color="grey-5"
-                ></q-btn
-              ></q-item-section>
+              <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
+                  @click="saveNewPreset()" color="white"></q-btn></q-item-section>
+              <q-item-section side v-else-if="
+                localData.label !== label_new_preset &&
+                localData.label !== 'Default'
+              "><q-btn flat icon="delete" @click="removePreset(this.localData.label)"
+                  color="grey-5"></q-btn></q-item-section>
             </q-item>
           </div>
 
@@ -109,73 +57,39 @@
             </q-btn>
             <BaseDialog v-model="showActionDialog" title="Action anpassen">
               <q-card-section>
-                <DurationSlider
-                  v-model="localData.action.value"
-                  :min="5"
-                  :max="3600"
-                  :step="5"
-                />
+                <DurationSlider v-model="localData.action.value" :min="5" :max="3600" :step="5" />
               </q-card-section>
             </BaseDialog>
           </div>
 
           <!-- Pause -->
           <div class="col-12">
-            <q-btn
-              no-caps
-              class="my-main-btn"
-              color="negative"
-              @click="showBreakDialog = true"
-            >
+            <q-btn no-caps class="my-main-btn" color="negative" @click="showBreakDialog = true">
               <q-icon name="pause_circle" class="q-mr-sm" />Pause:
               {{ formatTime(localData.break.value) }}
             </q-btn>
             <BaseDialog v-model="showBreakDialog" title="Pause anpassen">
               <q-card-section>
-                <DurationSlider
-                  v-model="localData.break.value"
-                  :min="0"
-                  :max="3600"
-                  :step="5"
-                />
+                <DurationSlider v-model="localData.break.value" :min="0" :max="3600" :step="5" />
               </q-card-section>
             </BaseDialog>
           </div>
 
           <!-- Excercises -->
           <div class="col-12">
-            <q-btn
-              no-caps
-              class="my-main-btn"
-              color="secondary"
-              @click="showExerciseDialog = true"
-            >
+            <q-btn no-caps class="my-main-btn" color="secondary" @click="showExerciseDialog = true">
               <q-icon name="fitness_center" class="q-mr-sm" />Übungen:
               {{ localData.exercises.value }} {{ localData.exercises.unit }}
             </q-btn>
             <BaseDialog v-model="showExerciseDialog" title="Übungen anpassen">
               <q-card-section>
-                <q-slider
-                  v-model="localData.exercises.value"
-                  label
-                  label-text-color="dark"
-                  color="white"
-                  thumb-size="50px"
-                  :step="1"
-                  :min="1"
-                  :max="50"
-                />
+                <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
+                  thumb-size="50px" :step="1" :min="1" :max="50" />
               </q-card-section>
               <q-card-section v-if="localData.exercises.value > 1">
                 <div class="q-gutter-sm">
-                  <q-input
-                    v-for="n in localData.exercises.value"
-                    :key="'name' + n"
-                    dense
-                    type="text"
-                    :label="'Übung ' + n"
-                    v-model="localData.exerciseNames[n - 1]"
-                  />
+                  <q-input v-for="n in localData.exercises.value" :key="'name' + n" dense type="text"
+                    :label="'Übung ' + n" v-model="localData.exerciseNames[n - 1]" />
                 </div>
               </q-card-section>
             </BaseDialog>
@@ -185,56 +99,27 @@
 
           <!-- Repetitions -->
           <div class="col-12">
-            <q-btn
-              no-caps
-              class="my-main-btn"
-              color="secondary"
-              @click="showRoundsDialog = true"
-            >
+            <q-btn no-caps class="my-main-btn" color="secondary" @click="showRoundsDialog = true">
               <q-icon name="restart_alt" class="q-mr-sm" />Wiederholungen:
               {{ localData.rounds.value }} {{ localData.rounds.unit }}
             </q-btn>
-            <BaseDialog
-              v-model="showRoundsDialog"
-              title="Wiederholungen anpassen"
-            >
+            <BaseDialog v-model="showRoundsDialog" title="Wiederholungen anpassen">
               <q-card-section>
-                <q-slider
-                  v-model="localData.rounds.value"
-                  label
-                  label-text-color="dark"
-                  color="white"
-                  thumb-size="50px"
-                  :step="1"
-                  :min="1"
-                  :max="50"
-                />
+                <q-slider v-model="localData.rounds.value" label label-text-color="dark" color="white" thumb-size="50px"
+                  :step="1" :min="1" :max="50" />
               </q-card-section>
             </BaseDialog>
           </div>
 
           <!-- BREAKS -->
           <div class="col-12">
-            <q-btn
-              no-caps
-              class="my-main-btn"
-              color="negative"
-              @click="showRoundBreakDialog = true"
-            >
+            <q-btn no-caps class="my-main-btn" color="negative" @click="showRoundBreakDialog = true">
               <q-icon name="restore" class="q-mr-sm" />Rundenpause:
               {{ formatTime(localData.round_break.value) }}
             </q-btn>
-            <BaseDialog
-              v-model="showRoundBreakDialog"
-              title="Rundenpause anpassen"
-            >
+            <BaseDialog v-model="showRoundBreakDialog" title="Rundenpause anpassen">
               <q-card-section>
-                <DurationSlider
-                  v-model="localData.round_break.value"
-                  :min="0"
-                  :max="3600"
-                  :step="5"
-                />
+                <DurationSlider v-model="localData.round_break.value" :min="0" :max="3600" :step="5" />
               </q-card-section>
             </BaseDialog>
           </div>
@@ -245,17 +130,8 @@
 
       <!-- TIMER -->
       <div v-else class="col-2">
-        <q-knob
-          show-value
-          class="text-white q-ma-md"
-          v-model="TIMER_PERCENTAGE"
-          size="150px"
-          :thickness="0.2"
-          color="grey-3"
-          :center-color="TIMER_COLOR"
-          track-color="transparent"
-          readonly=""
-        >
+        <q-knob show-value class="text-white q-ma-md" v-model="TIMER_PERCENTAGE" size="150px" :thickness="0.2"
+          color="grey-3" :center-color="TIMER_COLOR" track-color="transparent" readonly="">
           <div v-if="timer_finished === true">
             <span style="font-size: 3em">🥇</span>
           </div>
@@ -276,23 +152,15 @@
         </q-knob>
 
         <div v-if="TIME_DATA && TIME_DATA[TIME_IND] && !timer_halted">
-          <q-chip
-            >Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} /
-            {{ programSteps.length }}</q-chip
-          >
-          <q-chip
-            >Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} /
+          <q-chip>Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} /
+            {{ programSteps.length }}</q-chip>
+          <q-chip>Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} /
             {{
               programSteps[TIME_DATA[TIME_IND].step_ind].repetitions || 1
-            }}</q-chip
-          >
+            }}</q-chip>
         </div>
         <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND] && timer_halted">
-          <MY_ITEM_BTN
-            :label="'WEITER'"
-            :icon="'play_arrow'"
-            @clicked="proceedTimer()"
-          />
+          <MY_ITEM_BTN :label="'WEITER'" :icon="'play_arrow'" @clicked="proceedTimer()" />
         </div>
         <div v-else-if="timer_finished" class="text-orange-4">
           <div>
@@ -319,6 +187,7 @@ import { useAppStore } from "stores/appStore";
 import { useProgramStore } from "stores/programStore";
 import playSound from "src/tools/sound.js";
 import useTimer from "src/composables/useTimer";
+import { formatTime, calcDuration } from "src/utils/timeUtils";
 
 export default {
   name: "ProgrammTimer",
@@ -344,6 +213,7 @@ export default {
       stopInterval,
       progress,
       isActive,
+      formatTime,
     };
   },
   data() {
@@ -437,9 +307,9 @@ export default {
     },
 
     DURATION_CALC() {
-      if (this.TIME_DATA) return this.calcDuration(this.TIME_DATA);
-      if (this.programSteps.length) return this.calcDuration(this.programSteps);
-      return this.calcDuration(this.localData);
+      if (this.TIME_DATA) return calcDuration(this.TIME_DATA, this.progress);
+      if (this.programSteps.length) return calcDuration(this.programSteps);
+      return calcDuration(this.localData);
     },
 
     PRESETS() {
@@ -478,35 +348,7 @@ export default {
       this.$router.go(-1);
     },
 
-    // input is in seconds, output: mm:ss
-    formatTime(seconds) {
-      const date = new Date(null);
-      date.setSeconds(seconds);
-      return date.toISOString().substr(14, 5);
-    },
 
-    calcDuration(data) {
-      let total = 0; // in seconds
-      if (Array.isArray(data)) {
-        if (data.length && data[0]._check !== undefined) {
-          data.forEach((time) => {
-            if (time._check === false) total += time.value;
-          });
-          total -= this.progress;
-        } else {
-          data.forEach((step) => {
-            total += step.duration * (step.repetitions || 1);
-          });
-        }
-      } else {
-        const { action, break: _break, exercises, rounds, round_break } = data;
-        const action_time = action.value * exercises.value * rounds.value;
-        const break_time = _break.value * (exercises.value - 1) * rounds.value;
-        const round_break_time = round_break.value * (rounds.value - 1);
-        total = action_time + break_time + round_break_time;
-      }
-      return total;
-    },
 
     addPreset() {
       this.localData = JSON.parse(JSON.stringify(this.programStore.lastPreset));
@@ -531,20 +373,7 @@ export default {
     },
 
     selectPreset(preset) {
-      if (preset.data === undefined) {
-        // load last workout
-        this.localData = JSON.parse(
-          JSON.stringify(this.programStore.lastPreset)
-        );
-        return;
-      } else {
-        this.localData.action.value = preset.data.action.value;
-        this.localData.break.value = preset.data.break.value;
-        this.localData.exercises.value = preset.data.exercises.value;
-        this.localData.rounds.value = preset.data.rounds.value;
-        this.localData.round_break.value = preset.data.round_break.value;
-        this.localData.label = preset.label;
-      }
+      this.localData = this.programStore.selectPreset(preset, this.localData);
     },
 
     saveNewPreset() {
@@ -561,47 +390,17 @@ export default {
           dark: true,
         })
         .onOk((data) => {
-          // save preset
           const input = data.trim();
-          // check if name already exists
-          const preset_exists = this.programStore.presets.find(
-            (preset) =>
-              preset.label.trim().toLowerCase() === input.toLowerCase()
-          );
-          if (
-            input.toLowerCase() ===
-              this.label_new_preset.trim().toLowerCase() ||
-            preset_exists
-          ) {
+          if (!this.programStore.isPresetNameValid(input, this.label_new_preset)) {
             return this.$q.notify({
               message: "Bitte einen anderen Namen eingeben",
               color: "red-5",
               textColor: "white",
               icon: "warning",
             });
-          } //else
+          }
           this.localData.label = input;
-          const new_preset = {
-            label: input,
-            data: {
-              action: {
-                value: this.localData.action.value,
-              },
-              break: {
-                value: this.localData.break.value,
-              },
-              exercises: {
-                value: this.localData.exercises.value,
-              },
-              rounds: {
-                value: this.localData.rounds.value,
-              },
-              round_break: {
-                value: this.localData.round_break.value,
-              },
-            },
-          };
-          this.programStore.addPreset(new_preset);
+          this.programStore.createNewPreset(input, this.localData);
         });
     },
 
@@ -618,36 +417,7 @@ export default {
     },
 
     generateStepsFromSettings() {
-      const steps = [];
-      const {
-        action,
-        break: brk,
-        exercises,
-        rounds,
-        round_break,
-        exerciseNames,
-      } = this.localData;
-      for (let r = 0; r < rounds.value; r++) {
-        for (let e = 0; e < exercises.value; e++) {
-          steps.push({
-            type: "action",
-            duration: action.value,
-            repetitions: 1,
-            name: exerciseNames[e],
-          });
-          if (e < exercises.value - 1) {
-            steps.push({ type: "break", duration: brk.value, repetitions: 1 });
-          }
-        }
-        if (r < rounds.value - 1) {
-          steps.push({
-            type: "round_break",
-            duration: round_break.value,
-            repetitions: 1,
-          });
-        }
-      }
-      this.programStore.PROGRAM_STEPS = steps;
+      this.programStore.generateStepsFromSettings(this.localData);
     },
 
     onDragStart(idx) {
@@ -717,21 +487,7 @@ export default {
     },
 
     _prepareTimer() {
-      const times = [];
-      this.programSteps.forEach((step, stepInd) => {
-        const reps = step.repetitions || 1;
-        for (let i = 0; i < reps; i++) {
-          times.push({
-            type: step.type,
-            value: step.duration,
-            name: step.name,
-            step_ind: stepInd,
-            rep_ind: i,
-            _check: false,
-          });
-        }
-      });
-      return times;
+      return this.programStore.prepareTimerData();
     },
 
     stopTimer() {

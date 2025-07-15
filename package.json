@@ -5,7 +5,6 @@
   "productName": "Quasar App",
   "author": "stebro <stefan.brodoehl@gmail.com>",
   "private": true,
-  "type": "module",
   "scripts": {
     "dev": "quasar dev",
     "ios": "quasar dev -m ios --ide",

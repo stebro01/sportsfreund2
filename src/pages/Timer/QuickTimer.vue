@@ -2,29 +2,13 @@
   <q-page data-cy="page_about" class="full-height">
     <!-- TOP BAR -->
     <div>
-      <q-btn
-        icon="close"
-        size="lg"
-        flat
-        round
-        class="absolute-top-right"
-        @click="goBack()"
-      />
-      <q-btn
-        :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'"
-        size="lg"
-        flat
-        round
-        class="absolute-top-left"
-        @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)"
-      />
+      <q-btn icon="close" size="lg" flat round class="absolute-top-right" @click="goBack()" />
+      <q-btn :icon="!store.settings.audio_playback ? 'volume_off' : 'volume_up'" size="lg" flat round
+        class="absolute-top-left" @click="store.setSettingsAudioPlayback(!store.settings.audio_playback)" />
     </div>
 
     <!-- CONTENT -->
-    <div
-      class="column justify-center items-center"
-      style="height: 100vh; width: 100vw"
-    >
+    <div class="column justify-center items-center" style="height: 100vh; width: 100vw">
       <!-- TITLE -->
       <div class="col-1 full-width text-center">QuickTimer</div>
 
@@ -32,64 +16,28 @@
       <!-- BTN -->
       <div class="col-2">
         <!-- START -->
-        <q-btn v-if="!isActive" class="my-main-btn" @click="startTimer()"
-          >Start</q-btn
-        >
+        <q-btn v-if="!isActive" class="my-main-btn" @click="startTimer()">Start</q-btn>
         <!-- STOP -->
-        <q-btn v-if="isActive" class="my-main-btn" @click="stopTimer()"
-          >Stop</q-btn
-        >
+        <q-btn v-if="isActive" class="my-main-btn" @click="stopTimer()">Stop</q-btn>
       </div>
 
       <!-- CIRCLE -->
-      <div
-        class="col-6 row justify-center items-center"
-        style="position: relative"
-      >
-        <q-knob
-          show-value
-          class="text-white q-ma-md timer-knob"
-          v-model="TIMER_VALUE"
-          size="180px"
-          :thickness="0.2"
-          color="green-4"
-          :center-color="timer_finished ? 'green-4' : 'grey-6'"
-          track-color="transparent"
-          readonly=""
-        >
+      <div class="col-6 row justify-center items-center" style="position: relative">
+        <q-knob show-value class="text-white q-ma-md timer-knob" v-model="TIMER_VALUE" size="180px" :thickness="0.2"
+          color="green-4" :center-color="timer_finished ? 'green-4' : 'grey-6'" track-color="transparent" readonly="">
           <div class="text-center">
             <div>
               {{ formatTime(time - timer.progress) }}
-              <q-popup-edit
-                v-if="!isActive"
-                v-model="time"
-                auto-save
-                v-slot="scope"
-              >
-                <q-input
-                  v-model="scope.value"
-                  dense
-                  autofocus
-                  counter
-                  @keyup.enter="scope.set"
-                />
+              <q-popup-edit v-if="!isActive" v-model="time" auto-save v-slot="scope">
+                <q-input v-model="scope.value" dense autofocus counter @keyup.enter="scope.set" />
               </q-popup-edit>
             </div>
             <div class="my-small-text">Sekunden</div>
           </div>
         </q-knob>
 
-        <q-btn
-          flat
-          round
-          dense
-          size="lg"
-          icon="push_pin"
-          :color="isPinned ? 'amber-7' : 'grey-6'"
-          @click="togglePin"
-          class="absolute"
-          style="top: 10px; right: 10px"
-        >
+        <q-btn flat round dense size="lg" icon="push_pin" :color="isPinned ? 'amber-7' : 'grey-6'" @click="togglePin"
+          class="absolute" style="top: 10px; right: 10px">
           <q-tooltip>Pin</q-tooltip>
         </q-btn>
       </div>
@@ -97,61 +45,22 @@
       <!-- BUTTONS -->
       <div class="col-1">
         <div class="row justify-center q-gutter-md" v-if="!isActive">
-          <q-btn
-            class="my-decent-text"
-            color="positive"
-            @click="addTime(bigStep)"
-            round
-            >+{{ bigStep }}</q-btn
-          >
-          <q-btn
-            class="my-decent-text"
-            color="positive"
-            @click="addTime(1)"
-            round
-            >+1</q-btn
-          >
-          <q-btn
-            class="my-decent-text"
-            color="negative"
-            @click="addTime(-1)"
-            round
-            >-1</q-btn
-          >
-          <q-btn
-            class="my-decent-text"
-            color="negative"
-            @click="addTime(-bigStep)"
-            round
-            >-{{ bigStep }}</q-btn
-          >
+          <q-btn class="my-decent-text" color="positive" @click="addTime(bigStep)" round>+{{ bigStep }}</q-btn>
+          <q-btn class="my-decent-text" color="positive" @click="addTime(1)" round>+1</q-btn>
+          <q-btn class="my-decent-text" color="negative" @click="addTime(-1)" round>-1</q-btn>
+          <q-btn class="my-decent-text" color="negative" @click="addTime(-bigStep)" round>-{{ bigStep }}</q-btn>
         </div>
       </div>
       <div class="col-2"></div>
     </div>
-    <div
-      class="col-1 bottom-container fixed-bottom row justify-center items-center q-pa-sm"
-      v-if="store.pinnedTimers.length"
-    >
-      <q-btn
-        v-for="t in store.pinnedTimers"
-        :key="'p' + t"
-        round
-        size="sm"
-        color="amber-7"
-        class="q-mx-md"
-        no-caps
-        @click="selectTime(t)"
-      >
+    <div class="col-1 bottom-container fixed-bottom row justify-center items-center q-pa-sm"
+      v-if="store.pinnedTimers.length">
+      <q-btn v-for="t in store.pinnedTimers" :key="'p' + t" round size="sm" color="amber-7" class="q-mx-md" no-caps
+        @click="selectTime(t)">
         {{ t }}s
       </q-btn>
 
-      <q-btn
-        class="absolute-bottom-right"
-        @click="store.removePinnedTimers()"
-        icon="delete"
-        round
-      >
+      <q-btn class="absolute-bottom-right" @click="store.removePinnedTimers()" icon="delete" round>
         <q-tooltip>Entferne alle voreingestellten Timer</q-tooltip>
       </q-btn>
     </div>
@@ -162,13 +71,14 @@
 import { useAppStore } from "stores/appStore";
 import playSound from "src/tools/sound.js";
 import { useTimerStore } from "stores/timerStore";
+import { formatTime } from "src/utils/timeUtils";
 export default {
   name: "QuickTimer",
   components: {},
   setup() {
     const store = useAppStore();
     const timer = useTimerStore();
-    return { store, timer };
+    return { store, timer, formatTime };
   },
   data() {
     return {
@@ -176,7 +86,7 @@ export default {
       timer_finished: false,
     };
   },
-  mounted() {},
+  mounted() { },
 
   computed: {
     TIMER_VALUE() {
@@ -220,14 +130,7 @@ export default {
       }
     },
 
-    formatTime(seconds) {
-      if (seconds >= 60) {
-        const date = new Date(null);
-        date.setSeconds(seconds);
-        return date.toISOString().substr(14, 5);
-      }
-      return seconds;
-    },
+
 
     // TIMER
     startTimer() {

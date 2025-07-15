@@ -18,6 +18,7 @@ import ProgramSelectDialog from "components/ProgramSelectDialog.vue";
 import BaseDialog from "components/BaseDialog.vue";
 import { useAppStore } from "stores/appStore";
 import { useProgramStore } from "stores/programStore";
+import { calcDuration } from "src/utils/timeUtils";
 
 installQuasarPlugin();
 
@@ -140,7 +141,7 @@ describe("ProgramTimer", () => {
         },
       },
     });
-    const expected = altWrapper.vm.calcDuration(localStore.lastPreset);
+    const expected = calcDuration(localStore.lastPreset);
     expect(altWrapper.vm.DURATION_CALC).toBe(expected);
   });
 
@@ -148,7 +149,7 @@ describe("ProgramTimer", () => {
     const preset = programStore.presets.find((p) => p.data);
     wrapper.vm.selectPreset(preset);
     await wrapper.vm.$nextTick();
-    expect(wrapper.vm.DURATION_CALC).toBe(wrapper.vm.calcDuration(preset.data));
+    expect(wrapper.vm.DURATION_CALC).toBe(calcDuration(preset.data));
     expect(wrapper.vm.isActive).toBe(false);
   });
 
@@ -157,7 +158,7 @@ describe("ProgramTimer", () => {
     wrapper.vm.localData.action.value += 1;
     wrapper.vm.generateStepsFromSettings();
     await wrapper.vm.$nextTick();
-    const expected = wrapper.vm.calcDuration(wrapper.vm.programSteps);
+    const expected = calcDuration(wrapper.vm.programSteps);
     expect(wrapper.vm.DURATION_CALC).toBe(expected);
     expect(wrapper.vm.DURATION_CALC).not.toBe(start);
   });
