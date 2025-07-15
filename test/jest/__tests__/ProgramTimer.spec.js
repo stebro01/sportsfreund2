@@ -15,19 +15,22 @@ jest.mock("src/tools/sound.js", () => ({
 }));
 import ProgramTimer from "pages/Timer/ProgrammTimer.vue";
 import { useAppStore } from "stores/appStore";
+import { useProgramStore } from "stores/programStore";
 
 installQuasarPlugin();
 
 describe("ProgramTimer", () => {
   let wrapper;
-  let store;
+  let appStore;
+  let programStore;
 
   beforeEach(() => {
     jest.useFakeTimers();
     const pinia = createPinia();
     setActivePinia(pinia);
-    store = useAppStore();
-    store.PROGRAM_STEPS = [{ type: "action", duration: 1, repetitions: 1 }];
+    appStore = useAppStore();
+    programStore = useProgramStore();
+    programStore.PROGRAM_STEPS = [{ type: "action", duration: 1, repetitions: 1 }];
     wrapper = shallowMount(ProgramTimer, {
       global: {
         plugins: [pinia],
@@ -85,7 +88,7 @@ describe("ProgramTimer", () => {
     wrapper.vm.localData.round_break.value = 0;
     wrapper.vm.localData.exerciseNames = ["a", "b"];
     wrapper.vm.generateStepsFromSettings();
-    expect(store.programSteps).toEqual([
+    expect(programStore.programSteps).toEqual([
       { type: "action", duration: 2, repetitions: 1, name: "a" },
       { type: "break", duration: 1, repetitions: 1 },
       { type: "action", duration: 2, repetitions: 1, name: "b" },
@@ -93,7 +96,7 @@ describe("ProgramTimer", () => {
   });
 
   it("prepares timer data including names", () => {
-    store.PROGRAM_STEPS = [
+    programStore.PROGRAM_STEPS = [
       { type: "action", duration: 1, repetitions: 1, name: "x" },
     ];
     const times = wrapper.vm._prepareTimer();
@@ -104,7 +107,7 @@ describe("ProgramTimer", () => {
     const pinia = createPinia();
     setActivePinia(pinia);
     localStorage.clear();
-    const localStore = useAppStore();
+    const localStore = useProgramStore();
     const altWrapper = shallowMount(ProgramTimer, {
       global: {
         plugins: [pinia],
@@ -136,7 +139,7 @@ describe("ProgramTimer", () => {
   });
 
   it("updates program when preset is selected", async () => {
-    const preset = store.presets.find((p) => p.data);
+    const preset = programStore.presets.find((p) => p.data);
     wrapper.vm.selectPreset(preset);
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.DURATION_CALC).toBe(wrapper.vm.calcDuration(preset.data));
