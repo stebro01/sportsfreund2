@@ -33,21 +33,16 @@
         <div class="row q-gutter-y-md" style="width: 100vw; max-width: 1000px">
           <!-- SELECTION / PREVIOUS -->
           <div class="col-12">
-            <q-item clickable v-ripple class="q-ma-sm">
+            <q-item clickable v-ripple class="q-ma-sm"
+              style="border-radius: 10px; border-color: #f0f0f0; border-width: 1px; border-style: solid;">
               <q-item-section avatar><q-icon name="today" /></q-item-section>
               <q-item-section>
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
-                  }}</q-btn>
+                }}</q-btn>
                 <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
-              <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
-                  @click="saveNewPreset()" color="white"></q-btn></q-item-section>
-              <q-item-section side v-else-if="
-                localData.label !== label_new_preset &&
-                localData.label !== 'Default'
-              "><q-btn flat icon="delete" @click="removePreset(this.localData.label)"
-                  color="grey-5"></q-btn></q-item-section>
+
             </q-item>
           </div>
 
@@ -143,7 +138,7 @@
                 {{ formatTime(TIMER_VALUE) }}
                 <q-tooltip v-if="timerStore.timeData[timerStore.timeIndex].name">{{
                   timerStore.timeData[timerStore.timeIndex].name
-                  }}</q-tooltip>
+                }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
