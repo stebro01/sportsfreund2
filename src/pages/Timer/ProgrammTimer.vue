@@ -78,7 +78,7 @@
               <q-icon name="fitness_center" class="q-mr-sm" />Übungen:
               {{ localData.exercises.value }} {{ localData.exercises.unit }}
             </q-btn>
-            <BaseDialog v-model="showExerciseDialog" title="Übungen anpassen">
+            <BaseDialog v-model="showExerciseDialog" title="Übungen anpassen" size="500px">
               <q-card-section>
                 <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
                   thumb-size="50px" :step="1" :min="1" :max="50" />
@@ -86,7 +86,8 @@
               <q-card-section v-if="localData.exercises.value > 1">
                 <div class="q-gutter-sm">
                   <q-input v-for="n in localData.exercises.value" :key="'name' + n" dense type="text"
-                    :label="'Übung ' + n" v-model="localData.exerciseNames[n - 1]" />
+                    input-class="text-white" label-color="grey-8" :label="'Übung ' + n"
+                    v-model="localData.exerciseNames[n - 1]" />
                 </div>
               </q-card-section>
             </BaseDialog>
