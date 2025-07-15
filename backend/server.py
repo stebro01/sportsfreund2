@@ -5,14 +5,14 @@ import uuid
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 
+from .services import friend_service, user_service
+
 app = FastAPI()
 
 
 def _log_dir() -> Path:
-    """Return path to application data directory, creating it if needed."""
-    base = Path(os.getenv("APPDATA_PATH", Path(__file__).parent / "appdata"))
-    base.mkdir(parents=True, exist_ok=True)
-    return base
+    """Return path to application data directory."""
+    return user_service.appdata_dir()
 
 
 def _configure_logger() -> logging.Logger:
@@ -40,33 +40,17 @@ logger = _configure_logger()
 
 
 def _paths():
-    base = _log_dir()
-    return base / 'user.json', base / 'log.json'
+    return user_service.users_file(), user_service.log_file()
 
 
 def _load_json(path: Path, default):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        try:
-            return json.loads(path.read_text())
-        except json.JSONDecodeError:
-            return default
-    return default
+    return user_service._load_json(path, default)
 
 
 def _save_json(path: Path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data))
+    user_service._save_json(path, data)
 
 
-def load_users():
-    users_file, _ = _paths()
-    return _load_json(users_file, {})
-
-
-def save_users(data):
-    users_file, _ = _paths()
-    _save_json(users_file, data)
 
 
 def log_event(entry):
@@ -89,7 +73,7 @@ def log_message(payload: dict):
 def register(payload: dict):
     username = payload['username']
     password = payload['password']
-    users = load_users()
+    users = user_service.load_users()
     if any(u['username'] == username for u in users.values()):
         raise HTTPException(status_code=400, detail='User exists')
     uid = str(uuid.uuid4())
@@ -100,7 +84,7 @@ def register(payload: dict):
         'friends': [],
         'requests': []
     }
-    save_users(users)
+    user_service.save_users(users)
     log_event({'event': 'register', 'uid': uid})
     return {'uid': uid}
 
@@ -109,7 +93,7 @@ def register(payload: dict):
 def login(payload: dict):
     username = payload['username']
     password = payload['password']
-    users = load_users()
+    users = user_service.load_users()
     for u in users.values():
         if u['username'] == username and u['password'] == password:
             log_event({'event': 'login', 'uid': u['uid']})
@@ -121,13 +105,7 @@ def login(payload: dict):
 def friend_request(payload: dict):
     uid = payload['uid']
     friend_uid = payload['friend_uid']
-    users = load_users()
-    if friend_uid not in users:
-        raise HTTPException(status_code=404, detail='Friend not found')
-    user = users[friend_uid]
-    if uid not in user.get('requests', []):
-        user.setdefault('requests', []).append(uid)
-    save_users(users)
+    friend_service.send_request(uid, friend_uid)
     log_event({'event': 'friend_request', 'uid': uid, 'friend_uid': friend_uid})
     return {'status': 'sent'}
 
@@ -136,16 +114,7 @@ def friend_request(payload: dict):
 def friend_accept(payload: dict):
     uid = payload['uid']
     friend_uid = payload['friend_uid']
-    users = load_users()
-    user = users.get(uid)
-    friend = users.get(friend_uid)
-    if not user or not friend:
-        raise HTTPException(status_code=404, detail='User not found')
-    if friend_uid in user.get('requests', []):
-        user['requests'].remove(friend_uid)
-        user.setdefault('friends', []).append(friend_uid)
-        friend.setdefault('friends', []).append(uid)
-    save_users(users)
+    friend_service.accept_request(uid, friend_uid)
     log_event({'event': 'friend_accept', 'uid': uid, 'friend_uid': friend_uid})
     return {'status': 'accepted'}
 
