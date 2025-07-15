@@ -13,4 +13,7 @@ export default {
   transform: {
     '.*\\.js$': 'babel-jest',
   },
+  moduleNameMapper: {
+    '\\.(wav)$': '<rootDir>/test/jest/__mocks__/fileMock.js',
+  },
 };
