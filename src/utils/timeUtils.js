@@ -9,7 +9,7 @@ export function formatTime(seconds) {
     date.setSeconds(seconds);
     return date.toISOString().substr(14, 5);
   }
-  return seconds.toString();
+  return `${seconds}s`;
 }
 
 /**

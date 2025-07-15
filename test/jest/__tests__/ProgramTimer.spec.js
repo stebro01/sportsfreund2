@@ -15,7 +15,6 @@ jest.mock("src/tools/sound.js", () => ({
 }));
 import ProgramTimer from "pages/Timer/ProgrammTimer.vue";
 import ProgramSelectDialog from "components/ProgramSelectDialog.vue";
-import BaseDialog from "components/BaseDialog.vue";
 import { useAppStore } from "stores/appStore";
 import { useProgramStore } from "stores/programStore";
 import { calcDuration } from "src/utils/timeUtils";
@@ -39,7 +38,7 @@ describe("ProgramTimer", () => {
     wrapper = shallowMount(ProgramTimer, {
       global: {
         plugins: [pinia],
-        components: { ProgramSelectDialog, BaseDialog },
+        components: { ProgramSelectDialog },
         mocks: { $router: { go: jest.fn() } },
         stubs: {
           "q-page": true,
@@ -118,7 +117,7 @@ describe("ProgramTimer", () => {
     const altWrapper = shallowMount(ProgramTimer, {
       global: {
         plugins: [pinia],
-        components: { ProgramSelectDialog, BaseDialog },
+        components: { ProgramSelectDialog },
         mocks: { $router: { go: jest.fn() } },
         stubs: {
           "q-page": true,
