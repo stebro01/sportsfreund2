@@ -9,12 +9,11 @@ Workout steps are created automatically from your preset settings. Manual step a
 The Python backend uses **FastAPI** to handle user management and real-time chat.
 
 ### Start the server
-Run the backend with a virtual environment:
+Run the backend using the helper script. It sets up a virtual environment and
+installs dependencies from `backend/requirements.txt`.
 
 ```bash
-python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-uvicorn backend.server:app --reload
+./start_backend.sh
 ```
 
 ### Backend tests
