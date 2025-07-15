@@ -23,6 +23,15 @@ Execute the server tests with:
 pytest
 ```
 
+### Run backend tests
+Run the backend tests inside a virtual environment with:
+
+```bash
+source venv/bin/activate
+pip install -r backend/requirements.txt
+pytest backend/tests
+```
+
 ## Frontend
 The client is located in the `frontend` directory.
 
