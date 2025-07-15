@@ -34,21 +34,12 @@
             <q-item clickable v-ripple class="q-ma-sm">
               <q-item-section avatar><q-icon name="today" /></q-item-section>
               <q-item-section>
-                <q-btn-dropdown flat no-caps :label="PRESET_LABEL">
-                  <q-list class="bg-dark">
-                    <q-item clickable v-close-popup v-ripple v-for="preset in PRESETS"
-                      :key="preset.label + 'presetlist'" @click="selectPreset(preset)">
-                      <q-item-section>{{ preset.label }}</q-item-section>
-                      <q-item-section v-if="preset.data" side>
-                        <q-icon name="av_timer" />{{
-                          formatTime(calcDuration(preset.data))
-                        }}</q-item-section>
-                    </q-item>
-                    <q-item avatar v-close-popup="">
-                      <q-btn flat size="md" icon="add" @click="addPreset()"></q-btn>
-                    </q-item>
-                  </q-list>
-                </q-btn-dropdown>
+                <q-btn flat no-caps @click="showPresetDialog = true">{{ PRESET_LABEL }}</q-btn>
+                <ProgramSelectDialog
+                  v-model="showPresetDialog"
+                  :current-settings="localData"
+                  @select="selectPreset"
+                />
               </q-item-section>
               <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
                   @click="saveNewPreset()" color="white"></q-btn></q-item-section>
@@ -207,6 +198,7 @@
 <script>
 import MY_ITEM_BTN from "components/MyItemBtn.vue";
 import DurationSlider from "components/DurationSlider.vue";
+import ProgramSelectDialog from "components/ProgramSelectDialog.vue";
 import getRandomCitation from "src/tools/citate.js";
 import { useAppStore } from "stores/appStore";
 import { useProgramStore } from "stores/programStore";
@@ -218,6 +210,7 @@ export default {
   components: {
     MY_ITEM_BTN,
     DurationSlider,
+    ProgramSelectDialog,
   },
   setup() {
     const store = useAppStore();
@@ -250,6 +243,7 @@ export default {
       TIME_IND: undefined,
       label_new_preset: "Neues Programm",
       dragIndex: null,
+      showPresetDialog: false,
       showActionDialog: false,
       showBreakDialog: false,
       showExerciseDialog: false,
