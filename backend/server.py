@@ -77,6 +77,14 @@ def log_event(entry):
     logger.info(json.dumps(entry))
 
 
+@app.post('/log')
+def log_message(payload: dict):
+    """Append arbitrary log messages to the server logger."""
+    message = payload.get('message', '')
+    logger.info(message)
+    return {'status': 'ok'}
+
+
 @app.post('/register', status_code=201)
 def register(payload: dict):
     username = payload['username']

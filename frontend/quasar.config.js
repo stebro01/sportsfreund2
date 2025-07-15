@@ -23,6 +23,7 @@ export default configure(function (ctx) {
     boot: [
       'pinia',
       'axios',
+      'logger',
       'firebase'
     ],
 
