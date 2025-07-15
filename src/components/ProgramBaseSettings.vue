@@ -6,9 +6,9 @@
         <q-icon name="play_circle" class="q-mr-sm" />Action:
         {{ formatTime(localData.action.value) }}
       </q-btn>
-      <BaseDialog v-model="showActionDialog" title="Action anpassen">
+      <BaseDialog v-model="showActionDialog" title="Action anpassen" size="250px">
         <q-card-section>
-          <DurationSlider v-model="localData.action.value" :min="5" :max="3600" :step="5" />
+          <DurationSlider v-model="localData.action.value" :min="5" :mid="60" :max="3600" :step="5" />
         </q-card-section>
       </BaseDialog>
     </div>
@@ -19,7 +19,7 @@
         <q-icon name="pause_circle" class="q-mr-sm" />Pause:
         {{ formatTime(localData.break.value) }}
       </q-btn>
-      <BaseDialog v-model="showBreakDialog" title="Pause anpassen">
+      <BaseDialog v-model="showBreakDialog" title="Pause anpassen" size="250px">
         <q-card-section>
           <DurationSlider v-model="localData.break.value" :min="0" :max="3600" :step="5" />
         </q-card-section>
@@ -34,14 +34,12 @@
       </q-btn>
       <BaseDialog v-model="showExerciseDialog" title="Übungen anpassen" size="500px">
         <q-card-section>
-          <q-slider v-model="localData.exercises.value" label label-text-color="dark" color="white"
-            thumb-size="50px" :step="1" :min="1" :max="50" />
+          <DurationSlider v-model="localData.exercises.value" :min="1" :max="50" :showXOption="true" />
         </q-card-section>
         <q-card-section v-if="localData.exercises.value > 1">
           <div class="q-gutter-sm">
-            <q-input v-for="n in localData.exercises.value" :key="'name' + n" dense type="text"
-              input-class="text-white" label-color="grey-8" :label="'Übung ' + n"
-              v-model="localData.exerciseNames[n - 1]" />
+            <q-input v-for="n in localData.exercises.value" :key="'name' + n" dense type="text" input-class="text-white"
+              label-color="grey-8" :label="'Übung ' + n" v-model="localData.exerciseNames[n - 1]" />
           </div>
         </q-card-section>
       </BaseDialog>
@@ -55,10 +53,9 @@
         <q-icon name="restart_alt" class="q-mr-sm" />Wiederholungen:
         {{ localData.rounds.value }} {{ localData.rounds.unit }}
       </q-btn>
-      <BaseDialog v-model="showRoundsDialog" title="Wiederholungen anpassen">
+      <BaseDialog v-model="showRoundsDialog" title="Wiederholungen anpassen" size="250px">
         <q-card-section>
-          <q-slider v-model="localData.rounds.value" label label-text-color="dark" color="white"
-            thumb-size="50px" :step="1" :min="1" :max="50" />
+          <DurationSlider v-model="localData.rounds.value" :min="1" :max="50" :showXOption="true" />
         </q-card-section>
       </BaseDialog>
     </div>
@@ -69,7 +66,7 @@
         <q-icon name="restore" class="q-mr-sm" />Rundenpause:
         {{ formatTime(localData.round_break.value) }}
       </q-btn>
-      <BaseDialog v-model="showRoundBreakDialog" title="Rundenpause anpassen">
+      <BaseDialog v-model="showRoundBreakDialog" title="Rundenpause anpassen" size="250px">
         <q-card-section>
           <DurationSlider v-model="localData.round_break.value" :min="0" :max="3600" :step="5" />
         </q-card-section>

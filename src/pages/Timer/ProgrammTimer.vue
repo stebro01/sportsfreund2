@@ -39,7 +39,7 @@
               <q-item-section>
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
-                }}</q-btn>
+                  }}</q-btn>
                 <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
 
@@ -63,7 +63,7 @@
                 {{ formatTime(TIMER_VALUE) }}
                 <q-tooltip v-if="timerStore.timeData[timerStore.timeIndex].name">{{
                   timerStore.timeData[timerStore.timeIndex].name
-                }}</q-tooltip>
+                  }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
@@ -72,6 +72,15 @@
             </div>
           </div>
         </q-knob>
+
+        <!-- EXERCISE LABEL BANNER -->
+        <div v-if="timerStore.isProgramActive && !timerStore.isProgramFinished && CURRENT_EXERCISE_NAME"
+          class="exercise-banner q-my-md q-px-lg">
+          <q-banner class="bg-green-5 text-white text-center">
+            <q-icon name="fitness_center" class="q-mr-sm" />
+            {{ CURRENT_EXERCISE_NAME }}
+          </q-banner>
+        </div>
 
         <div v-if="timerStore.timeData && timerStore.timeData[timerStore.timeIndex] && !timerStore.isProgramHalted">
           <q-chip>Schritt: {{ timerStore.timeData[timerStore.timeIndex].step_ind + 1 }} /
@@ -97,14 +106,7 @@
       <!-- ENDE COL -->
     </div>
 
-    <!-- EXERCISE LABEL BANNER -->
-    <div v-if="timerStore.isProgramActive && !timerStore.isProgramFinished && CURRENT_EXERCISE_NAME"
-      class="exercise-banner fixed-bottom">
-      <q-banner class="bg-red text-white text-center">
-        <q-icon name="fitness_center" class="q-mr-sm" />
-        {{ CURRENT_EXERCISE_NAME }}
-      </q-banner>
-    </div>
+
   </q-page>
 </template>
 
