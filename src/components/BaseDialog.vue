@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modelValue">
-    <q-card class="my-popup-card text-center white-shadow">
+    <q-card class="my-popup-card text-center">
       <q-card-section v-if="title">{{ title }}</q-card-section>
       <slot />
     </q-card>

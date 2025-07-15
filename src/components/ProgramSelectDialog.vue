@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-model="modelValue">
-    <q-card class="my-popup-card text-center shadow-1">
+    <q-card class="my-popup-card text-center">
       <q-card-section>Programm auswählen</q-card-section>
       <q-card-section class="q-pa-none">
         <q-list style="max-height: 250px; overflow-y: auto">
