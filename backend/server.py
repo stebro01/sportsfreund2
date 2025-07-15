@@ -9,8 +9,10 @@ app = FastAPI()
 
 
 def _log_dir() -> Path:
-    """Return path to application data directory."""
-    return Path(os.getenv("APPDATA_PATH", Path(__file__).parent / "appdata"))
+    """Return path to application data directory, creating it if needed."""
+    base = Path(os.getenv("APPDATA_PATH", Path(__file__).parent / "appdata"))
+    base.mkdir(parents=True, exist_ok=True)
+    return base
 
 
 def _configure_logger() -> logging.Logger:
@@ -147,9 +149,11 @@ class ConnectionManager:
     async def connect(self, uid: str, websocket: WebSocket):
         await websocket.accept()
         self.active[uid] = websocket
+        log_event({"event": "ws_connect", "uid": uid})
 
     def disconnect(self, uid: str):
         self.active.pop(uid, None)
+        log_event({"event": "ws_disconnect", "uid": uid})
 
     async def send_personal(self, uid: str, message: str):
         if uid in self.active:
