@@ -8,6 +8,8 @@ const routes = [
       { path: 'about', name: 'About', component: () => import('pages/AboutPage.vue') },
       { path: 'changelog', name: 'ChangeLog', component: () => import('pages/ChangeLogPage.vue') },
       { path: 'impressum', name: 'Impressum', component: () => import('pages/ImpressumPage.vue') },
+      { path: 'login', name: 'Login', component: () => import('pages/LoginPage.vue') },
+      { path: 'chat', name: 'Chat', component: () => import('pages/ChatPage.vue') },
 
     ]
   },
