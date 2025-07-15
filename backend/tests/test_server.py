@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 from fastapi.testclient import TestClient
 from backend.server import app
 
@@ -44,3 +45,14 @@ def test_websocket_chat(tmp_path):
             data = json.loads(ws2.receive_text())
             assert data['from'] == u1
             assert data['message'] == 'hi'
+
+
+def test_log_endpoint(tmp_path):
+    client = setup_env(tmp_path)
+    msg = 'test message'
+    r = client.post('/log', json={'message': msg})
+    assert r.status_code == 200
+    log_file = Path(__file__).resolve().parent.parent / 'appdata' / 'logs.txt'
+    assert log_file.exists()
+    contents = log_file.read_text()
+    assert msg in contents

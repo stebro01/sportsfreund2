@@ -23,13 +23,13 @@ describe("DurationSlider", () => {
   it("formats label for values below 60s", () => {
     const wrapper = mountSlider(30);
     expect(wrapper.vm.labelValue).toBe("30s");
-    expect(wrapper.vm.step).toBe(5);
+    expect(wrapper.vm.currentStep).toBe(5);
   });
 
   it("formats label for values of one minute or more", () => {
     const wrapper = mountSlider(75);
-    expect(wrapper.vm.labelValue).toBe("1m 15s");
-    expect(wrapper.vm.step).toBe(10);
+    expect(wrapper.vm.labelValue).toBe("01:15");
+    expect(wrapper.vm.currentStep).toBe(15);
   });
 
   it("uses provided step prop", () => {
