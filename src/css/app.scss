@@ -65,6 +65,10 @@ body {
   color: $light;
 }
 
+.white-shadow {
+  box-shadow: 0 0 8px white;
+}
+
 @media (min-width: 401px) {
   h1,
   .text-h1 {
