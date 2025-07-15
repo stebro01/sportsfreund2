@@ -38,7 +38,7 @@
               <q-item-section>
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
-                  }}</q-btn>
+                }}</q-btn>
                 <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
               <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
@@ -143,7 +143,7 @@
                 {{ formatTime(TIMER_VALUE) }}
                 <q-tooltip v-if="timerStore.timeData[timerStore.timeIndex].name">{{
                   timerStore.timeData[timerStore.timeIndex].name
-                  }}</q-tooltip>
+                }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
@@ -229,6 +229,15 @@ export default {
   },
   mounted() {
     this.programStore.PROGRAM_STEPS = [];
+    // Reset timer state when entering the page to avoid stale state
+    if (this.timerStore.isProgramHalted && !this.timerStore.isProgramActive) {
+      this.timerStore.clearProgramTimer();
+    }
+  },
+
+  unmounted() {
+    // Clean up timer when leaving the page
+    this.timerStore.stopProgramTimer();
   },
 
   computed: {
