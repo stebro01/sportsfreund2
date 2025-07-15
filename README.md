@@ -14,6 +14,10 @@ npm install
 yarn
 ```
 
+> **Proxy configuration:** npm looks for `proxy` or `https-proxy` settings.
+> Configure your proxy via `NPM_CONFIG_PROXY` or add `proxy=<url>` in your
+> `.npmrc` instead of using `npm_config_http_proxy`.
+
 ### Development server
 Run the dev server with hot reloading:
 
