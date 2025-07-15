@@ -1,18 +1,19 @@
 <template>
   <q-dialog v-model="modelValue">
     <q-card class="my-popup-card my-popup-card-xl text-center">
-      <q-btn class="absolute-top-right z-top" flat icon="close" @click="modelValue = false" />
+      <q-btn class="absolute-top-right z-top" flat round icon="close" @click="modelValue = false" />
       <q-card-section class="text-h6" style="height: 50px">Programm auswählen</q-card-section>
       <q-separator dark />
       <q-card-section class="q-pa-none" style="height: calc(100% - 100px)">
         <q-list style="height: 100%; overflow-y: auto" class="q-pa-sm">
           <q-item v-for="preset in sortedPresets" :key="preset.label" clickable @click="selectPreset(preset)"
             :class="{ 'bg-primary text-white': isCurrentPreset(preset) }">
-            <q-item-section>{{ preset.label }}</q-item-section>
             <q-item-section v-if="preset.data" side>
               <q-icon name="av_timer" class="q-mr-xs" />
               {{ formatTime(calcDuration(preset.data)) }}
             </q-item-section>
+            <q-item-section>{{ preset.label }}</q-item-section>
+
             <q-item-section side class="q-gutter-xs">
               <q-btn v-if="preset.data && isCurrentPreset(preset) && isDifferent(preset.data, currentSettings)" flat
                 dense icon="save" :color="isCurrentPreset(preset) ? 'white' : 'primary'"
