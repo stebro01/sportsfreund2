@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { formatTime, calcDuration } from "src/utils/timeUtils";
 
 const templatePresets = [
-  { label: "letztes Workout laden", data: undefined },
   {
     label: "Tabata",
     data: {
@@ -52,16 +51,30 @@ export const useProgramStore = defineStore("program", {
       presets = null;
     }
 
+    let currentSelectedPreset;
+    try {
+      const rawCurrentSelected = localStorage.getItem(
+        "current_selected_preset"
+      );
+      if (rawCurrentSelected !== null)
+        currentSelectedPreset = JSON.parse(rawCurrentSelected);
+    } catch (e) {
+      currentSelectedPreset = undefined;
+    }
+
     return {
       LAST_PRESET: lastPreset || undefined,
       PRESETS: presets || templatePresets,
       PROGRAM_STEPS: [],
+      CURRENT_SELECTED_PRESET: currentSelectedPreset || undefined,
     };
   },
   getters: {
     lastPreset: (state) => state.LAST_PRESET || defaultPreset,
     presets: (state) => state.PRESETS,
     programSteps: (state) => state.PROGRAM_STEPS,
+    currentSelectedPreset: (state) =>
+      state.CURRENT_SELECTED_PRESET || defaultPreset,
 
     // Utility getters
     formatTime: () => formatTime,
@@ -71,6 +84,10 @@ export const useProgramStore = defineStore("program", {
     setLastPreset(payload) {
       localStorage.setItem("last_preset", JSON.stringify(payload));
       this.LAST_PRESET = payload;
+    },
+    setCurrentSelectedPreset(payload) {
+      localStorage.setItem("current_selected_preset", JSON.stringify(payload));
+      this.CURRENT_SELECTED_PRESET = payload;
     },
     addPreset(payload) {
       this.PRESETS.push(payload);
@@ -163,19 +180,18 @@ export const useProgramStore = defineStore("program", {
 
     // Preset management methods
     selectPreset(preset, currentData) {
-      if (preset.data === undefined) {
-        // load last workout
-        return JSON.parse(JSON.stringify(this.lastPreset));
-      } else {
-        const newData = { ...currentData };
-        newData.action.value = preset.data.action.value;
-        newData.break.value = preset.data.break.value;
-        newData.exercises.value = preset.data.exercises.value;
-        newData.rounds.value = preset.data.rounds.value;
-        newData.round_break.value = preset.data.round_break.value;
-        newData.label = preset.label;
-        return newData;
-      }
+      const newData = { ...currentData };
+      newData.action.value = preset.data.action.value;
+      newData.break.value = preset.data.break.value;
+      newData.exercises.value = preset.data.exercises.value;
+      newData.rounds.value = preset.data.rounds.value;
+      newData.round_break.value = preset.data.round_break.value;
+      newData.label = preset.label;
+
+      // Save the selected preset as current
+      this.setCurrentSelectedPreset(newData);
+
+      return newData;
     },
 
     createNewPreset(label, data) {

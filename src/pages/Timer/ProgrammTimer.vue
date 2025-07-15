@@ -38,7 +38,7 @@
               <q-item-section>
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
-                }}</q-btn>
+                  }}</q-btn>
                 <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
               <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
@@ -143,7 +143,7 @@
                 {{ formatTime(TIMER_VALUE) }}
                 <q-tooltip v-if="timerStore.timeData[timerStore.timeIndex].name">{{
                   timerStore.timeData[timerStore.timeIndex].name
-                }}</q-tooltip>
+                  }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
@@ -212,8 +212,8 @@ export default {
   data() {
     return {
       localData: {
-        ...JSON.parse(JSON.stringify(this.programStore.lastPreset)),
-        exerciseNames: this.programStore.lastPreset.exerciseNames || [],
+        ...JSON.parse(JSON.stringify(this.programStore.currentSelectedPreset)),
+        exerciseNames: this.programStore.currentSelectedPreset.exerciseNames || [],
       },
       label_new_preset: "Neues Programm",
       dragIndex: null,
@@ -233,6 +233,10 @@ export default {
     if (this.timerStore.isProgramHalted && !this.timerStore.isProgramActive) {
       this.timerStore.clearProgramTimer();
     }
+
+    // Automatically load the current selected preset
+    this.localData = JSON.parse(JSON.stringify(this.programStore.currentSelectedPreset));
+    this.localData.exerciseNames = this.programStore.currentSelectedPreset.exerciseNames || [];
   },
 
   unmounted() {

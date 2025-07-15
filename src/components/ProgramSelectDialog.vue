@@ -6,17 +6,19 @@
       <q-separator dark />
       <q-card-section class="q-pa-none" style="height: calc(100% - 100px)">
         <q-list style="height: 100%; overflow-y: auto" class="q-pa-sm">
-          <q-item v-for="preset in programStore.presets" :key="preset.label" clickable @click="selectPreset(preset)">
+          <q-item v-for="preset in sortedPresets" :key="preset.label" clickable @click="selectPreset(preset)"
+            :class="{ 'bg-primary text-white': isCurrentPreset(preset) }">
             <q-item-section>{{ preset.label }}</q-item-section>
             <q-item-section v-if="preset.data" side>
               <q-icon name="av_timer" class="q-mr-xs" />
               {{ formatTime(calcDuration(preset.data)) }}
             </q-item-section>
             <q-item-section side class="q-gutter-xs">
-              <q-btn v-if="preset.data && isDifferent(preset.data, currentSettings)" flat dense icon="save"
+              <q-btn v-if="preset.data && isCurrentPreset(preset) && isDifferent(preset.data, currentSettings)" flat
+                dense icon="save" :color="isCurrentPreset(preset) ? 'white' : 'primary'"
                 @click.stop="overwritePreset(preset)" />
-              <q-btn v-if="preset.label !== 'Default'" flat dense icon="delete" color="grey-5"
-                @click.stop="deletePreset(preset)" />
+              <q-btn v-if="preset.label !== 'Default'" flat dense icon="delete"
+                :color="isCurrentPreset(preset) ? 'white' : 'grey-5'" @click.stop="deletePreset(preset)" />
             </q-item-section>
           </q-item>
         </q-list>
@@ -49,10 +51,27 @@ const modelValue = computed({
   set: (val) => emit('update:modelValue', val),
 });
 
+const sortedPresets = computed(() => {
+  const allPresets = programStore.presets;
+  const currentPreset = props.currentSettings;
+
+  return [...allPresets].sort((a, b) => {
+    const isAActive = a.label === currentPreset?.label;
+    const isBActive = b.label === currentPreset?.label;
+
+    if (isAActive && !isBActive) return -1;
+    if (!isAActive && isBActive) return 1;
+    return 0;
+  });
+});
 
 
 function isDifferent(data, current) {
   return JSON.stringify(data) !== JSON.stringify(current);
+}
+
+function isCurrentPreset(preset) {
+  return preset.label === props.currentSettings?.label;
 }
 
 function selectPreset(preset) {
