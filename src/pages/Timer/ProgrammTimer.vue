@@ -172,6 +172,15 @@
 
       <!-- ENDE COL -->
     </div>
+
+    <!-- EXERCISE LABEL BANNER -->
+    <div v-if="timerStore.isProgramActive && !timerStore.isProgramFinished && CURRENT_EXERCISE_NAME"
+      class="exercise-banner fixed-bottom">
+      <q-banner class="bg-red text-white text-center">
+        <q-icon name="fitness_center" class="q-mr-sm" />
+        {{ CURRENT_EXERCISE_NAME }}
+      </q-banner>
+    </div>
   </q-page>
 </template>
 
@@ -284,6 +293,16 @@ export default {
 
     ZITAT() {
       return getRandomCitation();
+    },
+
+    CURRENT_EXERCISE_NAME() {
+      if (this.timerStore.timeData &&
+        this.timerStore.timeData[this.timerStore.timeIndex] &&
+        this.timerStore.timeData[this.timerStore.timeIndex].name &&
+        this.timerStore.timeData[this.timerStore.timeIndex].type === 'action') {
+        return this.timerStore.timeData[this.timerStore.timeIndex].name;
+      }
+      return null;
     },
   },
 
@@ -424,3 +443,16 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.exercise-banner {
+  z-index: 1000;
+}
+
+.exercise-banner .q-banner {
+  border-radius: 0;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 12px;
+}
+</style>

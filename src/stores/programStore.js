@@ -10,6 +10,7 @@ const templatePresets = [
       exercises: { value: 4 },
       rounds: { value: 5 },
       round_break: { value: 15 },
+      exerciseNames: ["Übung 1", "Übung 2", "Übung 3", "Übung 4"],
     },
   },
   {
@@ -20,6 +21,7 @@ const templatePresets = [
       exercises: { value: 3 },
       rounds: { value: 3 },
       round_break: { value: 5 },
+      exerciseNames: ["Übung 1", "Übung 2", "Übung 3"],
     },
   },
 ];
@@ -30,6 +32,7 @@ const defaultPreset = {
   exercises: { value: 2, unit: "x" },
   rounds: { value: 2, unit: "x" },
   round_break: { value: 10, unit: "s" },
+  exerciseNames: ["Übung 1", "Übung 2"],
   label: "Default",
 };
 
@@ -142,7 +145,7 @@ export const useProgramStore = defineStore("program", {
             type: "action",
             duration: action.value,
             repetitions: 1,
-            name: exerciseNames[e] || "",
+            name: exerciseNames[e] || `Übung ${e + 1}`,
           });
           if (e < exercises.value - 1) {
             steps.push({ type: "break", duration: brk.value, repetitions: 1 });
@@ -186,6 +189,7 @@ export const useProgramStore = defineStore("program", {
       newData.exercises.value = preset.data.exercises.value;
       newData.rounds.value = preset.data.rounds.value;
       newData.round_break.value = preset.data.round_break.value;
+      newData.exerciseNames = preset.data.exerciseNames || [];
       newData.label = preset.label;
 
       // Save the selected preset as current
@@ -203,6 +207,7 @@ export const useProgramStore = defineStore("program", {
           exercises: { value: data.exercises.value },
           rounds: { value: data.rounds.value },
           round_break: { value: data.round_break.value },
+          exerciseNames: data.exerciseNames || [],
         },
       };
       this.addPreset(new_preset);
