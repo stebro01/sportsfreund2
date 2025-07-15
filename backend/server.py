@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import uuid
 from pathlib import Path
@@ -7,8 +8,37 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 app = FastAPI()
 
 
+def _log_dir() -> Path:
+    """Return path to application data directory."""
+    return Path(os.getenv("APPDATA_PATH", Path(__file__).parent / "appdata"))
+
+
+def _configure_logger() -> logging.Logger:
+    """Configure logger to log to console and a file."""
+    base = _log_dir()
+    base.mkdir(parents=True, exist_ok=True)
+    log_path = base / "logs.txt"
+
+    logger = logging.getLogger("server")
+    if not logger.handlers:
+        logger.setLevel(logging.INFO)
+        formatter = logging.Formatter(
+            "%(asctime)s - %(levelname)s - %(message)s"
+        )
+        fh = logging.FileHandler(log_path)
+        fh.setFormatter(formatter)
+        ch = logging.StreamHandler()
+        ch.setFormatter(formatter)
+        logger.addHandler(fh)
+        logger.addHandler(ch)
+    return logger
+
+
+logger = _configure_logger()
+
+
 def _paths():
-    base = Path(os.getenv('APPDATA_PATH', Path(__file__).parent / 'appdata'))
+    base = _log_dir()
     return base / 'user.json', base / 'log.json'
 
 
@@ -42,6 +72,7 @@ def log_event(entry):
     log = _load_json(log_file, [])
     log.append(entry)
     _save_json(log_file, log)
+    logger.info(json.dumps(entry))
 
 
 @app.post('/register', status_code=201)
