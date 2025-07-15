@@ -66,6 +66,11 @@ body {
   box-shadow: 0 0 8px white;
 }
 
+.my-popup-card-xl {
+  max-height: 90vh;
+  min-height: 500px;
+}
+
 @media (min-width: 401px) {
   h1,
   .text-h1 {
