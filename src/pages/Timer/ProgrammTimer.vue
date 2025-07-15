@@ -209,6 +209,7 @@ import MY_ITEM_BTN from "components/MyItemBtn.vue";
 import DurationSlider from "components/DurationSlider.vue";
 import getRandomCitation from "src/tools/citate.js";
 import { useAppStore } from "stores/appStore";
+import { useProgramStore } from "stores/programStore";
 import playSound from "src/tools/sound.js";
 import useTimer from "src/composables/useTimer";
 
@@ -220,21 +221,29 @@ export default {
   },
   setup() {
     const store = useAppStore();
+    const programStore = useProgramStore();
     const {
       start: startInterval,
       stop: stopInterval,
       progress,
       isActive,
     } = useTimer();
-    return { store, startInterval, stopInterval, progress, isActive };
+    return {
+      store,
+      programStore,
+      startInterval,
+      stopInterval,
+      progress,
+      isActive,
+    };
   },
   data() {
     return {
       timer_finished: false,
       timer_halted: false,
       localData: {
-        ...JSON.parse(JSON.stringify(this.store.lastPreset)),
-        exerciseNames: this.store.lastPreset.exerciseNames || [],
+        ...JSON.parse(JSON.stringify(this.programStore.lastPreset)),
+        exerciseNames: this.programStore.lastPreset.exerciseNames || [],
       },
       // progress state handled by composable
       TIME_DATA: undefined,
@@ -251,12 +260,12 @@ export default {
     };
   },
   mounted() {
-    this.store.PROGRAM_STEPS = [];
+    this.programStore.PROGRAM_STEPS = [];
   },
 
   computed: {
     programSteps() {
-      return this.store.programSteps;
+      return this.programStore.programSteps;
     },
 
     STEP_OPTIONS() {
@@ -324,7 +333,7 @@ export default {
     },
 
     PRESETS() {
-      return this.store.presets;
+      return this.programStore.presets;
     },
 
     PRESET_LABEL() {
@@ -390,7 +399,7 @@ export default {
     },
 
     addPreset() {
-      this.localData = JSON.parse(JSON.stringify(this.store.lastPreset));
+      this.localData = JSON.parse(JSON.stringify(this.programStore.lastPreset));
       this.localData.label = this.label_new_preset;
     },
 
@@ -406,7 +415,7 @@ export default {
         })
         .onOk(() => {
           // remove preset
-          this.store.removePreset(label);
+          this.programStore.removePreset(label);
           this.localData.label = "Letztes Programm";
         });
     },
@@ -414,7 +423,7 @@ export default {
     selectPreset(preset) {
       if (preset.data === undefined) {
         // load last workout
-        this.localData = JSON.parse(JSON.stringify(this.store.lastPreset));
+        this.localData = JSON.parse(JSON.stringify(this.programStore.lastPreset));
         return;
       } else {
         this.localData.action.value = preset.data.action.value;
@@ -443,7 +452,7 @@ export default {
           // save preset
           const input = data.trim();
           // check if name already exists
-          const preset_exists = this.store.presets.find(
+          const preset_exists = this.programStore.presets.find(
             (preset) =>
               preset.label.trim().toLowerCase() === input.toLowerCase()
           );
@@ -480,12 +489,12 @@ export default {
               },
             },
           };
-          this.store.addPreset(new_preset);
+          this.programStore.addPreset(new_preset);
         });
     },
 
     removeStep(index) {
-      this.store.removeProgramStep(index);
+      this.programStore.removeProgramStep(index);
     },
 
     openStepDurationDialog(idx) {
@@ -526,7 +535,7 @@ export default {
           });
         }
       }
-      this.store.PROGRAM_STEPS = steps;
+      this.programStore.PROGRAM_STEPS = steps;
     },
 
     onDragStart(idx) {
@@ -535,7 +544,7 @@ export default {
 
     onDrop(idx) {
       if (this.dragIndex === null) return;
-      this.store.moveProgramStep(this.dragIndex, idx);
+      this.programStore.moveProgramStep(this.dragIndex, idx);
       this.dragIndex = null;
     },
 
@@ -549,7 +558,7 @@ export default {
       playSound("beepbeepbeep_1s", this.store.settings.audio_playback);
       await this.delay(1500);
 
-      this.store.setLastPreset(JSON.parse(JSON.stringify(this.localData)));
+      this.programStore.setLastPreset(JSON.parse(JSON.stringify(this.localData)));
 
       // start timer
       this.nextTimer();

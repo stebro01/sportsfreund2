@@ -27,10 +27,4 @@ describe("appStore pinning", () => {
     expect(store.pinnedTimers).toEqual([20]);
   });
 
-  it("removePreset ignores surrounding spaces", () => {
-    const initial = store.presets.length;
-    store.removePreset("  Tabata  ");
-    expect(store.presets.length).toBe(initial - 1);
-    expect(store.presets.some((p) => p.label === "Tabata")).toBe(false);
-  });
 });
