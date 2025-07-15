@@ -70,11 +70,12 @@ describe("ProgramTimer", () => {
   });
 
   it("runs program and resets progress when finished", () => {
-    wrapper.vm.TIME_DATA = wrapper.vm._prepareTimer();
-    wrapper.vm.nextTimer();
+    const timeData = wrapper.vm._prepareTimer();
+    wrapper.vm.timerStore.timeData = timeData;
+    wrapper.vm.timerStore.nextProgramTimer();
     jest.advanceTimersByTime(1000);
-    expect(wrapper.vm.timer_finished).toBe(true);
-    expect(wrapper.vm.progress).toBe(0);
+    expect(wrapper.vm.timerStore.isProgramFinished).toBe(true);
+    expect(wrapper.vm.timerStore.programProgress).toBe(0);
   });
 
   it("stopTimer halts timer and resets progress", () => {
@@ -82,8 +83,8 @@ describe("ProgramTimer", () => {
     jest.advanceTimersByTime(1500);
     jest.advanceTimersByTime(500);
     wrapper.vm.stopTimer();
-    expect(wrapper.vm.timer_halted).toBe(true);
-    expect(wrapper.vm.progress).toBe(0);
+    expect(wrapper.vm.timerStore.isProgramHalted).toBe(true);
+    expect(wrapper.vm.timerStore.programProgress).toBe(0);
   });
 
   it("generates program steps from settings", () => {
@@ -150,7 +151,7 @@ describe("ProgramTimer", () => {
     wrapper.vm.selectPreset(preset);
     await wrapper.vm.$nextTick();
     expect(wrapper.vm.DURATION_CALC).toBe(calcDuration(preset.data));
-    expect(wrapper.vm.isActive).toBe(false);
+    expect(wrapper.vm.timerStore.isProgramActive).toBe(false);
   });
 
   it("recalculates duration when settings change", async () => {

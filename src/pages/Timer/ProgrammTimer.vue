@@ -8,25 +8,27 @@
       <!-- TIMER ELEMENT -->
       <!-- BTN -->
       <div class="col-2">
-        <MY_ITEM_BTN v-if="!isActive && timer_halted === false" :label="'START'" :icon="'play_arrow'"
-          @clicked="startTimer()" />
-        <MY_ITEM_BTN v-if="!isActive && timer_halted === true" :label="'ABBRECHEN'" :icon="'close'"
-          @clicked="clearTimer()" />
-        <MY_ITEM_BTN v-if="isActive && !timer_finished" :label="'STOP'" :icon="'stop'" @clicked="stopTimer()" />
-        <MY_ITEM_BTN v-if="isActive && timer_finished" :label="'ZURÜCK'" :icon="'arrow_back'" @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="!timerStore.isProgramActive && !timerStore.isProgramHalted" :label="'START'"
+          :icon="'play_arrow'" @clicked="startTimer()" />
+        <MY_ITEM_BTN v-if="!timerStore.isProgramActive && timerStore.isProgramHalted" :label="'ABBRECHEN'"
+          :icon="'close'" @clicked="clearTimer()" />
+        <MY_ITEM_BTN v-if="timerStore.isProgramActive && !timerStore.isProgramFinished" :label="'STOP'" :icon="'stop'"
+          @clicked="stopTimer()" />
+        <MY_ITEM_BTN v-if="timerStore.isProgramActive && timerStore.isProgramFinished" :label="'ZURÜCK'"
+          :icon="'arrow_back'" @clicked="clearTimer()" />
       </div>
 
       <!-- DURATION -->
       <div class="col-1">
         <q-chip class="bg-orange-5">
-          <span class="text-caption q-mr-sm" v-if="!TIME_DATA">Total:</span>
+          <span class="text-caption q-mr-sm" v-if="!timerStore.timeData">Total:</span>
           <span class="text-caption q-mr-sm" v-else>Rest:</span>
           <span class="text-h6">{{ formatTime(DURATION_CALC) }}</span>
         </q-chip>
       </div>
 
       <!-- OPTIONS -->
-      <div v-if="!isActive && timer_halted === false" class="row justify-center">
+      <div v-if="!timerStore.isProgramActive && !timerStore.isProgramHalted" class="row justify-center">
         <!-- STEUER ELEMENTE -->
         <div class="row q-gutter-y-md" style="width: 100vw; max-width: 1000px">
           <!-- SELECTION / PREVIOUS -->
@@ -36,7 +38,7 @@
               <q-item-section>
                 <q-btn flat no-caps @click="showPresetDialog = true">{{
                   PRESET_LABEL
-                }}</q-btn>
+                  }}</q-btn>
                 <ProgramSelectDialog v-model="showPresetDialog" :current-settings="localData" @select="selectPreset" />
               </q-item-section>
               <q-item-section side v-if="localData.label === label_new_preset"><q-btn flat icon="save"
@@ -132,16 +134,16 @@
       <div v-else class="col-2">
         <q-knob show-value class="text-white q-ma-md" v-model="TIMER_PERCENTAGE" size="150px" :thickness="0.2"
           color="grey-3" :center-color="TIMER_COLOR" track-color="transparent" readonly="">
-          <div v-if="timer_finished === true">
+          <div v-if="timerStore.isProgramFinished">
             <span style="font-size: 3em">🥇</span>
           </div>
-          <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND]">
-            <div v-if="!timer_halted">
+          <div v-else-if="timerStore.timeData && timerStore.timeData[timerStore.timeIndex]">
+            <div v-if="!timerStore.isProgramHalted">
               <div>
                 {{ formatTime(TIMER_VALUE) }}
-                <q-tooltip v-if="TIME_DATA[TIME_IND].name">{{
-                  TIME_DATA[TIME_IND].name
-                }}</q-tooltip>
+                <q-tooltip v-if="timerStore.timeData[timerStore.timeIndex].name">{{
+                  timerStore.timeData[timerStore.timeIndex].name
+                  }}</q-tooltip>
               </div>
               <div class="text-caption">{{ TIMER_TYPE }}</div>
             </div>
@@ -151,18 +153,18 @@
           </div>
         </q-knob>
 
-        <div v-if="TIME_DATA && TIME_DATA[TIME_IND] && !timer_halted">
-          <q-chip>Schritt: {{ TIME_DATA[TIME_IND].step_ind + 1 }} /
+        <div v-if="timerStore.timeData && timerStore.timeData[timerStore.timeIndex] && !timerStore.isProgramHalted">
+          <q-chip>Schritt: {{ timerStore.timeData[timerStore.timeIndex].step_ind + 1 }} /
             {{ programSteps.length }}</q-chip>
-          <q-chip>Wdh.: {{ TIME_DATA[TIME_IND].rep_ind + 1 }} /
+          <q-chip>Wdh.: {{ timerStore.timeData[timerStore.timeIndex].rep_ind + 1 }} /
             {{
-              programSteps[TIME_DATA[TIME_IND].step_ind].repetitions || 1
+              programSteps[timerStore.timeData[timerStore.timeIndex].step_ind].repetitions || 1
             }}</q-chip>
         </div>
-        <div v-else-if="TIME_DATA && TIME_DATA[TIME_IND] && timer_halted">
+        <div v-else-if="timerStore.timeData && timerStore.timeData[timerStore.timeIndex] && timerStore.isProgramHalted">
           <MY_ITEM_BTN :label="'WEITER'" :icon="'play_arrow'" @clicked="proceedTimer()" />
         </div>
-        <div v-else-if="timer_finished" class="text-orange-4">
+        <div v-else-if="timerStore.isProgramFinished" class="text-orange-4">
           <div>
             {{ ZITAT.text_de }}
           </div>
@@ -185,8 +187,7 @@ import BaseDialog from "components/BaseDialog.vue";
 import getRandomCitation from "src/tools/citate.js";
 import { useAppStore } from "stores/appStore";
 import { useProgramStore } from "stores/programStore";
-import playSound from "src/tools/sound.js";
-import useTimer from "src/composables/useTimer";
+import { useTimerStore } from "stores/timerStore";
 import { formatTime, calcDuration } from "src/utils/timeUtils";
 
 export default {
@@ -200,33 +201,20 @@ export default {
   setup() {
     const store = useAppStore();
     const programStore = useProgramStore();
-    const {
-      start: startInterval,
-      stop: stopInterval,
-      progress,
-      isActive,
-    } = useTimer();
+    const timerStore = useTimerStore();
     return {
       store,
       programStore,
-      startInterval,
-      stopInterval,
-      progress,
-      isActive,
+      timerStore,
       formatTime,
     };
   },
   data() {
     return {
-      timer_finished: false,
-      timer_halted: false,
       localData: {
         ...JSON.parse(JSON.stringify(this.programStore.lastPreset)),
         exerciseNames: this.programStore.lastPreset.exerciseNames || [],
       },
-      // progress state handled by composable
-      TIME_DATA: undefined,
-      TIME_IND: undefined,
       label_new_preset: "Neues Programm",
       dragIndex: null,
       showPresetDialog: false,
@@ -256,58 +244,23 @@ export default {
       ];
     },
     TIMER_VALUE() {
-      if (!this.TIME_DATA) return 0;
-      // return the value of the current timer as difference from value and the current time
-      const currentTimer = this.TIME_DATA[this.TIME_IND];
-      return currentTimer.value - this.progress;
+      return this.timerStore.currentTimerValue;
     },
 
     TIMER_PERCENTAGE() {
-      if (!this.TIME_DATA) return 0;
-      // return the value of the current timer as difference from value and the current time
-      const currentTimer = this.TIME_DATA[this.TIME_IND];
-      if (!currentTimer) return 0;
-      return (this.progress / currentTimer.value) * 100;
+      return this.timerStore.currentTimerPercentage;
     },
 
     TIMER_TYPE() {
-      // return a string matching the value of the current timer
-      if (!this.TIME_DATA) return "";
-      const currentTimer = this.TIME_DATA[this.TIME_IND];
-      if (!currentTimer) return "";
-      switch (currentTimer.type) {
-        case "action":
-          return "Action";
-        case "break":
-          return "Pause";
-        case "round_break":
-          return "Rundenpause";
-        default:
-          return "";
-      }
+      return this.timerStore.currentTimerType;
     },
 
     TIMER_COLOR() {
-      // create a color string matching the value of the current timer
-      if (!this.TIME_DATA) return "";
-      const currentTimer = this.TIME_DATA[this.TIME_IND];
-      if (this.timer_halted) return "grey-7";
-      if (this.timer_finished) return "dark";
-      if (!currentTimer) return "";
-      switch (currentTimer.type) {
-        case "action":
-          return "green-4";
-        case "break":
-          return "red-4";
-        case "round_break":
-          return "grey-6";
-        default:
-          return "";
-      }
+      return this.timerStore.currentTimerColor;
     },
 
     DURATION_CALC() {
-      if (this.TIME_DATA) return calcDuration(this.TIME_DATA, this.progress);
+      if (this.timerStore.timeData) return calcDuration(this.timerStore.timeData, this.timerStore.programProgress);
       if (this.programSteps.length) return calcDuration(this.programSteps);
       return calcDuration(this.localData);
     },
@@ -344,7 +297,7 @@ export default {
 
   methods: {
     goBack() {
-      this.stopInterval(false);
+      this.timerStore.stopProgramTimer();
       this.$router.go(-1);
     },
 
@@ -432,58 +385,18 @@ export default {
 
     // TIMER
     async startTimer() {
-      this.timer_finished = false;
-      this.timer_halted = false;
       this.generateStepsFromSettings();
-      this.TIME_DATA = this._prepareTimer(); // prepare an array with the times
-      // COUNT DOWN 1s
-      playSound("beepbeepbeep_1s", this.store.settings.audio_playback);
-      await this.delay(1500);
+      const timeData = this._prepareTimer();
 
       this.programStore.setLastPreset(
         JSON.parse(JSON.stringify(this.localData))
       );
 
-      // start timer
-      this.nextTimer();
-    },
-
-    // go through the times array and set the timer, set times[X]._check to true if finished
-    nextTimer(VALUE) {
-      //determine next timer, where _check is false
-      if (this.TIME_DATA === undefined) return;
-      // get the indes of the next timer
-      this.TIME_IND = this.TIME_DATA.findIndex((time) => time._check === false);
-      // if no timer is left, stop
-      if (this.TIME_IND === -1) {
-        this.timer_finished = true;
-        this.progress = 0;
-        playSound("tada", this.store.settings.audio_playback);
-        return;
-      } // else
-
-      const nextTimer = this.TIME_DATA[this.TIME_IND];
-
-      this.progress = VALUE || 0;
-      // now start the intervall with ticks of 1s
-      this.startInterval(() => {
-        // check if timer is finished
-        if (this.progress === nextTimer.value - 1)
-          playSound("beep_1s", this.store.settings.audio_playback);
-        if (this.progress >= nextTimer.value) {
-          // set _check to true
-          nextTimer._check = true;
-          // stop timer
-          this.stopInterval();
-          // start next timer
-          this.nextTimer();
-        }
-      });
+      await this.timerStore.startProgramTimer(timeData, this.store.settings.audio_playback);
     },
 
     proceedTimer() {
-      this.timer_halted = false;
-      this.nextTimer(this.progress);
+      this.timerStore.proceedProgramTimer();
     },
 
     _prepareTimer() {
@@ -491,25 +404,11 @@ export default {
     },
 
     stopTimer() {
-      // stopp the timer / intervall
-      this.stopInterval();
-      this.timer_finished = false;
-      this.timer_halted = true;
+      this.timerStore.stopProgramTimer();
     },
 
     clearTimer() {
-      // clear the timer
-      this.stopTimer();
-      this.TIME_DATA = undefined;
-      this.progress = 0;
-      this.timer_halted = false;
-      this.timer_finished = false;
-    },
-
-    // SOME HELPER
-
-    delay(time) {
-      return new Promise((resolve) => setTimeout(resolve, time));
+      this.timerStore.clearProgramTimer();
     },
 
     // ENDE
