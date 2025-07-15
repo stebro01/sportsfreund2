@@ -1,42 +1,73 @@
-# Quasar App (sportsfreund2)
+# Sportsfreund Timer App
 
-A Quasar Project
+A Quasar/Vue 3 timer application for organizing workouts paired with a small FastAPI backend. The app offers Quick Timer and Program Timer modes and lets you invite friends to share sessions.
 
-## Install the dependencies
+### Program Timer
+Workout steps are created automatically from your preset settings. Manual step addition is no longer available.
+
+## Backend
+The Python backend uses **FastAPI** to handle user management and real-time chat.
+
+### Start the server
+Run the backend using the helper script. It sets up a virtual environment and
+installs dependencies from `backend/requirements.txt`.
+
 ```bash
-yarn
-# or
+./start_backend.sh
+```
+
+### Backend tests
+Execute the server tests with:
+
+```bash
+pytest
+```
+
+### Run backend tests
+Run the backend tests inside a virtual environment with:
+
+```bash
+source venv/bin/activate
+pip install -r backend/requirements.txt
+pytest backend/tests
+```
+
+## Frontend
+The client is located in the `frontend` directory.
+
+### Project setup
+Install dependencies using npm or yarn:
+
+```bash
+# from the repository root
+cd frontend
 npm install
-```
-
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
-```bash
-quasar dev
-```
-
-
-### Lint the files
-```bash
-yarn lint
 # or
-npm run lint
+yarn
 ```
 
+> **Proxy configuration:** npm looks for `proxy` or `https-proxy` settings.
+> Configure your proxy via `NPM_CONFIG_PROXY` or add `proxy=<url>` in your
+> `.npmrc` instead of using `npm_config_http_proxy`.
 
-### Format the files
+### Development server
+Run the dev server with hot reloading (first-time install shown for convenience):
+
 ```bash
-yarn format
-# or
-npm run format
+cd frontend && npm install && quasar dev
 ```
 
+### Build for production
+Create an optimized build:
 
-
-### Build the app for production
 ```bash
-quasar build
+cd frontend && quasar build
 ```
 
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js).
-# sportsfreund2
+### Unit tests
+Execute unit tests with:
+
+```bash
+cd frontend && npm run test:unit
+```
+
