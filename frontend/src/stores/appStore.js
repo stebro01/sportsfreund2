@@ -34,6 +34,12 @@ export const useAppStore = defineStore("app", {
           route: "Register",
         },
         { titel: "Chat", caption: "chat", icon: "chat", route: "Chat" },
+        {
+          titel: "Status",
+          caption: "status",
+          icon: "person",
+          route: "UserStatus",
+        },
         { titel: "Impressum", caption: "", icon: "gavel", route: "Impressum" },
       ],
     };

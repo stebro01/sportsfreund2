@@ -69,3 +69,18 @@ def test_cors_options(tmp_path):
     )
     assert r.status_code == 200
     assert r.headers.get("access-control-allow-origin") == "http://localhost:8080"
+
+
+def test_user_update_delete(tmp_path):
+    client = setup_env(tmp_path)
+    uid = client.post('/register', json={'username': 'alice', 'password': 'x'}).json()['uid']
+    r = client.put(f'/user/{uid}', json={'username': 'bob', 'age': 30, 'password': 'y'})
+    assert r.status_code == 200
+    data = json.load(open(tmp_path / 'user.json'))
+    assert data[uid]['username'] == 'bob'
+    assert data[uid]['age'] == 30
+    assert data[uid]['password'] == 'y'
+    r = client.delete(f'/user/{uid}')
+    assert r.status_code == 200
+    data = json.load(open(tmp_path / 'user.json'))
+    assert uid not in data

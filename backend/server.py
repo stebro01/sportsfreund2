@@ -111,6 +111,26 @@ def login(payload: dict):
     raise HTTPException(status_code=401, detail='Invalid credentials')
 
 
+@app.put('/user/{uid}')
+def update_user(uid: str, payload: dict):
+    """Modify an existing user."""
+    values = {}
+    for key in ('username', 'password', 'age'):
+        if key in payload:
+            values[key] = payload[key]
+    user_service.update_user(uid, values)
+    log_event({'event': 'update_user', 'uid': uid})
+    return {'status': 'updated'}
+
+
+@app.delete('/user/{uid}')
+def remove_user(uid: str):
+    """Delete a user account."""
+    user_service.delete_user(uid)
+    log_event({'event': 'delete_user', 'uid': uid})
+    return {'status': 'deleted'}
+
+
 @app.post('/friend/request')
 def friend_request(payload: dict):
     uid = payload['uid']
