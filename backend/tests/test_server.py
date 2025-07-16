@@ -42,7 +42,11 @@ def test_friend_request_accept(tmp_path):
     client = setup_env(tmp_path)
     u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
     u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
-    client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
+    with client.websocket_connect(f'/ws/{u2}') as ws:
+        client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
+        data = json.loads(ws.receive_text())
+        assert data['event'] == 'chat_request'
+        assert data['from'] == u1
     users = json.load(open(tmp_path/'user.json'))
     assert u1 in users[u2]['requests']
     client.post('/friend/accept', json={'uid': u2, 'friend_uid': u1})
@@ -61,6 +65,8 @@ def test_websocket_chat(tmp_path):
             data = json.loads(ws2.receive_text())
             assert data['from'] == u1
             assert data['message'] == 'hi'
+    hist = client.get(f'/messages/{u1}/{u2}').json()
+    assert hist[0]['message'] == 'hi'
 
 
 def test_log_endpoint(tmp_path):

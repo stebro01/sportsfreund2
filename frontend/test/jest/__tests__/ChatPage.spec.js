@@ -25,21 +25,24 @@ describe("ChatPage", () => {
     wrapper = shallowMount(ChatPage, {
       global: {
         plugins: [pinia],
-        stubs: { "q-page": true, "q-input": true, "q-btn": true },
+        stubs: {
+          "q-page": true,
+          "q-input": true,
+          "q-btn": true,
+          "q-select": true,
+        },
       },
     });
     notifyMock = jest.fn();
     wrapper.vm.$q.notify = notifyMock;
   });
 
-  it("connect opens websocket and updates state", async () => {
-    wrapper.vm.friend = "you";
-    await wrapper.vm.connect();
+  it("opens websocket on mount and loads messages", async () => {
     expect(global.WebSocket).toHaveBeenCalledWith("ws://localhost:8000/ws/me");
     wsMock.onopen();
-    expect(wrapper.vm.connected).toBe(true);
+    wrapper.vm.friend = "you";
     wsMock.onmessage({ data: JSON.stringify({ from: "you", message: "hi" }) });
-    expect(wrapper.vm.messages[0].text).toBe("hi");
+    expect(wrapper.vm.histories["you"][0].text).toBe("hi");
   });
 
   it("send forwards message over websocket", async () => {
@@ -48,7 +51,7 @@ describe("ChatPage", () => {
     wrapper.vm.text = "hello";
     wrapper.vm.send();
     expect(wsMock.send).toHaveBeenCalledWith(
-      JSON.stringify({ to: "you", message: "hello" }),
+      JSON.stringify({ to: "you", message: "hello" })
     );
     expect(wrapper.vm.text).toBe("");
   });
@@ -61,6 +64,5 @@ describe("ChatPage", () => {
       type: "negative",
       message: "boom",
     });
-    expect(global.WebSocket).not.toHaveBeenCalled();
   });
 });
