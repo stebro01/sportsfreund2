@@ -6,8 +6,12 @@
       <q-input v-model="username" label="Username" input-class="text-white" label-color="grey-7" readonly />
       <q-input v-model.number="age" type="number" label="Age" input-class="text-white" label-color="grey-7" />
       <q-input v-model="password" type="password" label="New Password" input-class="text-white" label-color="grey-7" />
-      <q-btn label="Save" color="primary" @click="save" />
-      <q-btn label="Delete Account" color="negative" @click="remove" />
+      <q-btn icon="save" label="Save" color="primary" @click="save" />
+      <q-btn class="q-mt-xl" icon="logout" label="Logout" color="primary" @click="logout" />
+      <q-separator dark  class="q-my-xl"/>
+
+      <q-btn class="q-mt-sm" icon="delete" label="Delete Account" color="negative" @click="remove" />
+
     </div>
   </q-page>
 </template>
@@ -76,5 +80,14 @@ const remove = async () => {
     const msg = err.response?.data?.detail || err.message;
     $q.notify({ type: "negative", message: msg });
   }
+};
+
+const logout = () => {
+  auth.uid = null;
+  auth.username = "";
+  localStorage.removeItem("uid");
+  localStorage.removeItem("username");
+  localStorage.removeItem("password");
+  router.push({name: 'Login'});
 };
 </script>
