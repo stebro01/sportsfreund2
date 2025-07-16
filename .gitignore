@@ -10,7 +10,7 @@ venv/
 
 # Logs
 *.log
-backend/appdata/*.txt
+backend/appdata/*
 
 # Node
 node_modules/
