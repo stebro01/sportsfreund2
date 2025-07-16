@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from .services import friend_service, user_service
+from .services import friend_service, user_service, message_service
 
 app = FastAPI()
 
@@ -150,6 +150,14 @@ def friend_request(payload: dict):
     friend_uid = payload['friend_uid']
     friend_service.send_request(uid, friend_uid)
     log_event({'event': 'friend_request', 'uid': uid, 'friend_uid': friend_uid})
+    if friend_uid in manager.active:
+        import asyncio
+        asyncio.run(
+            manager.send_personal(
+                friend_uid,
+                json.dumps({"event": "chat_request", "from": uid}),
+            )
+        )
     return {'status': 'sent'}
 
 
@@ -160,6 +168,13 @@ def friend_accept(payload: dict):
     friend_service.accept_request(uid, friend_uid)
     log_event({'event': 'friend_accept', 'uid': uid, 'friend_uid': friend_uid})
     return {'status': 'accepted'}
+
+
+@app.get('/messages/{uid}/{friend_uid}')
+def get_messages(uid: str, friend_uid: str):
+    room = message_service.room_id(uid, friend_uid)
+    history = message_service.get_history(room)
+    return history
 
 
 class ConnectionManager:
@@ -191,6 +206,9 @@ async def websocket_endpoint(websocket: WebSocket, uid: str):
             data = await websocket.receive_json()
             recipient = data['to']
             message = data['message']
+            room = message_service.room_id(uid, recipient)
+            entry = {'from': uid, 'to': recipient, 'message': message}
+            message_service.add_message(room, entry)
             await manager.send_personal(
                 recipient,
                 json.dumps({'from': uid, 'message': message})
