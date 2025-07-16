@@ -2,6 +2,7 @@
   <q-page class="column items-center justify-center">
     <div class="text-h5 q-mb-md">Login</div>
     <div class="column q-gutter-sm" style="width: 300px">
+      <q-form @submit="doLogin">
       <q-input
         v-model="username"
         label="Username"
@@ -15,8 +16,11 @@
         input-class="text-white"
         label-color="grey-7"
       />
-      <q-btn label="Login" color="primary" @click="doLogin" />
-      <q-btn label="Register" flat @click="doRegister" />
+      <div class="column">
+      <q-btn label="Login" color="primary" type="submit" />
+      <q-btn label="Register" flat @click="doRegister" class="q-mt-xl" />
+    </div>
+    </q-form>
     </div>
   </q-page>
 </template>
@@ -45,6 +49,6 @@ const doLogin = async () => {
 };
 
 const doRegister = async () => {
-  await store.register(username.value, password.value);
+  router.push({name: 'Register'});
 };
 </script>

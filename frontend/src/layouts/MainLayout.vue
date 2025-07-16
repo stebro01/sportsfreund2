@@ -141,6 +141,7 @@ export default {
       localStorage.removeItem("username");
       localStorage.removeItem("password");
       this.leftDrawerOpen = false;
+      this.$router.push({name: 'Login'});
     },
     userProfile() {
       this.$router.push({name: 'UserStatus'});

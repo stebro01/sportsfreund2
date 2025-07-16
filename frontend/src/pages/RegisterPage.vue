@@ -15,6 +15,7 @@
       <q-btn
         label="Back to Login"
         flat
+        class="q-mt-xl"
         @click="$router.push({ name: 'Login' })"
       />
     </div>

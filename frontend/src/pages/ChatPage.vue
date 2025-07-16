@@ -1,7 +1,7 @@
 <template>
-  <q-page class="column items-start q-pa-md">
-    <div class="row q-gutter-sm items-center">
-      <q-input v-model="friend" label="Friend UID" />
+  <q-page class="column items-center q-pa-md">
+    <div class="column q-gutter-sm items-center">
+      <q-input v-model="friend" label="Friend UID" input-class="text-white" label-color="grey-7" />
       <q-btn label="Connect" color="primary" @click="connect" />
     </div>
     <div class="q-mt-md" v-if="connected">
