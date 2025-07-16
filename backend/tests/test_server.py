@@ -56,3 +56,16 @@ def test_log_endpoint(tmp_path):
     assert log_file.exists()
     contents = log_file.read_text()
     assert msg in contents
+
+
+def test_cors_options(tmp_path):
+    client = setup_env(tmp_path)
+    r = client.options(
+        "/login",
+        headers={
+            "Origin": "http://localhost:8080",
+            "Access-Control-Request-Method": "POST",
+        },
+    )
+    assert r.status_code == 200
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:8080"
