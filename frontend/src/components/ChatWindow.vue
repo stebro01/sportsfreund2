@@ -6,7 +6,7 @@
       class="q-pa-sm"
       style="height: 200px; overflow: auto; border: 1px solid #ccc"
     >
-      <div v-for="m in messages" :key="m.time" class="text-white">
+      <div v-for="m in messages" :key="m.id" class="text-white">
         <span class="text-bold">{{ senderName(m.from) }}</span
         >: {{ m.text }}
       </div>

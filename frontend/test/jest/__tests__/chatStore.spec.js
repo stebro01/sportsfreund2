@@ -69,4 +69,15 @@ describe("chatStore requests", () => {
     await store.connect();
     expect(store.friends).toEqual([{ uid: "f1", name: "Bob" }]);
   });
+
+  it("filters duplicate messages when fetching history", async () => {
+    store.friend = "u1";
+    ws.onmessage({ data: JSON.stringify({ from: "u1", message: "hi" }) });
+    const msgTime = store.messages[0].time;
+    getMock.mockResolvedValueOnce({
+      data: [{ from: "u1", to: "me", message: "hi", time: msgTime }],
+    });
+    await store.fetchHistory("u1");
+    expect(store.messages).toHaveLength(1);
+  });
 });

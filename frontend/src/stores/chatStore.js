@@ -52,7 +52,13 @@ export const useChatStore = defineStore("chat", {
           if (f) f.online = data.online;
           return;
         }
-        const msg = { from: data.from, text: data.message, time: Date.now() };
+        const now = Date.now();
+        const msg = {
+          id: `${now}-${data.from}`,
+          from: data.from,
+          text: data.message,
+          time: now,
+        };
         if (!this.histories[data.from]) this.histories[data.from] = [];
         this.histories[data.from].push(msg);
         if (this.friend === data.from) this.messages.push(msg);
@@ -103,8 +109,26 @@ export const useChatStore = defineStore("chat", {
       const api = useApiStore();
       try {
         const res = await api.get(`/messages/${auth.uid}/${fid}`);
-        this.histories[fid] = res.data || [];
-        if (this.friend === fid) this.messages = this.histories[fid];
+        const incoming = (res.data || []).map((m) => {
+          const t = m.time || Date.now();
+          return {
+            id: `${t}-${m.from}`,
+            from: m.from,
+            text: m.message,
+            time: t,
+          };
+        });
+        const existing = this.histories[fid] || [];
+        const ids = new Set(existing.map((m) => m.id));
+        const merged = [...existing];
+        for (const msg of incoming) {
+          if (!ids.has(msg.id)) {
+            merged.push(msg);
+            ids.add(msg.id);
+          }
+        }
+        this.histories[fid] = merged;
+        if (this.friend === fid) this.messages = merged;
       } catch (err) {
         this.histories[fid] = [];
       }
@@ -142,7 +166,13 @@ export const useChatStore = defineStore("chat", {
       const auth = useAuthStore();
       if (!this.ws || !this.friend) return;
       this.ws.send(JSON.stringify({ to: this.friend, message: msg }));
-      const selfMsg = { from: auth.uid, text: msg, time: Date.now() };
+      const now = Date.now();
+      const selfMsg = {
+        id: `${now}-${auth.uid}`,
+        from: auth.uid,
+        text: msg,
+        time: now,
+      };
       if (!this.histories[this.friend]) this.histories[this.friend] = [];
       this.histories[this.friend].push(selfMsg);
       this.messages.push(selfMsg);
