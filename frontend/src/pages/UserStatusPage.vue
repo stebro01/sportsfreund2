@@ -48,6 +48,8 @@ const remove = async () => {
     auth.uid = null;
     auth.username = "";
     localStorage.removeItem("uid");
+    localStorage.removeItem("username");
+    localStorage.removeItem("password");
     $q.notify({ type: "positive", message: "Account deleted" });
   } catch (err) {
     const msg = err.response?.data?.detail || err.message;

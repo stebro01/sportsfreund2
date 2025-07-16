@@ -28,6 +28,16 @@ def test_register_login(tmp_path):
     assert uid in data
 
 
+def test_user_get(tmp_path):
+    client = setup_env(tmp_path)
+    uid = client.post('/register', json={'username': 'alice', 'password': 'x'}).json()['uid']
+    r = client.get(f'/user/{uid}')
+    assert r.status_code == 200
+    data = r.json()
+    assert data['uid'] == uid
+    assert data['username'] == 'alice'
+
+
 def test_friend_request_accept(tmp_path):
     client = setup_env(tmp_path)
     u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']

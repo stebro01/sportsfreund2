@@ -14,6 +14,8 @@ export const useAuthStore = defineStore("auth", {
         this.uid = res.data.uid;
         this.username = username;
         localStorage.setItem("uid", this.uid);
+        localStorage.setItem("username", username);
+        if (password) localStorage.setItem("password", password);
       } catch (err) {
         throw err;
       }
@@ -25,13 +27,31 @@ export const useAuthStore = defineStore("auth", {
         this.uid = res.data.uid;
         this.username = username;
         localStorage.setItem("uid", this.uid);
+        localStorage.setItem("username", username);
+        if (password) localStorage.setItem("password", password);
       } catch (err) {
         throw err;
       }
     },
-    autoLogin() {
+    async autoLogin() {
       const id = localStorage.getItem("uid");
-      if (id) this.uid = id;
+      if (!id) return;
+      this.uid = id;
+      const name = localStorage.getItem("username");
+      if (name) {
+        this.username = name;
+        return;
+      }
+      const api = useApiStore();
+      try {
+        const res = await api.get(`/user/${id}`);
+        if (res.data && res.data.username) {
+          this.username = res.data.username;
+          localStorage.setItem("username", this.username);
+        }
+      } catch (err) {
+        // ignore errors
+      }
     },
     async sendFriendRequest(friend_uid) {
       const api = useApiStore();

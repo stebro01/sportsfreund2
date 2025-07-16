@@ -128,6 +128,8 @@ export default {
       this.auth.uid = null;
       this.auth.username = "";
       localStorage.removeItem("uid");
+      localStorage.removeItem("username");
+      localStorage.removeItem("password");
       this.leftDrawerOpen = false;
     },
   },

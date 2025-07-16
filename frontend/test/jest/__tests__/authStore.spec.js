@@ -4,9 +4,14 @@ import { useAuthStore } from "stores/authStore";
 
 jest.mock("stores/apiStore", () => {
   const postMock = jest.fn(() => Promise.resolve({ data: { uid: "123" } }));
-  return { useApiStore: () => ({ post: postMock }), postMock };
+  const getMock = jest.fn(() => Promise.resolve({ data: { username: "bob" } }));
+  return {
+    useApiStore: () => ({ post: postMock, get: getMock }),
+    postMock,
+    getMock,
+  };
 });
-import { postMock } from "stores/apiStore";
+import { postMock, getMock } from "stores/apiStore";
 
 describe("authStore", () => {
   let store;
@@ -21,17 +26,30 @@ describe("authStore", () => {
     await store.register("a", "b");
     expect(store.uid).toBe("123");
     expect(localStorage.getItem("uid")).toBe("123");
+    expect(localStorage.getItem("username")).toBe("a");
+    expect(localStorage.getItem("password")).toBe("b");
   });
 
   it("login saves uid", async () => {
     await store.login("a", "b");
     expect(store.uid).toBe("123");
+    expect(localStorage.getItem("username")).toBe("a");
+    expect(localStorage.getItem("password")).toBe("b");
   });
 
-  it("autoLogin loads uid", () => {
+  it("autoLogin loads stored username", async () => {
     localStorage.setItem("uid", "xyz");
-    store.autoLogin();
+    localStorage.setItem("username", "saved");
+    await store.autoLogin();
     expect(store.uid).toBe("xyz");
+    expect(store.username).toBe("saved");
+  });
+
+  it("autoLogin fetches username when missing", async () => {
+    localStorage.setItem("uid", "xyz");
+    await store.autoLogin();
+    expect(getMock).toHaveBeenCalledWith("/user/xyz");
+    expect(store.username).toBe("bob");
   });
 
   it("sendFriendRequest posts to backend", async () => {
