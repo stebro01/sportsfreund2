@@ -3,13 +3,22 @@
     <div class="text-h6 text-white q-mb-sm">{{ friend.name }}</div>
     <div
       ref="container"
-      class="q-pa-sm"
-      style="height: 200px; overflow: auto; border: 1px solid #ccc"
+      class="q-pa-sm bg-dark"
+      style="
+        height: 200px;
+        overflow: auto;
+        border: 1px solid var(--q-color-decent);
+      "
     >
-      <div v-for="m in messages" :key="m.id" class="text-white">
-        <span class="text-bold">{{ senderName(m.from) }}</span
-        >: {{ m.text }}
-      </div>
+      <q-chat-message
+        v-for="m in messages"
+        :key="m.id"
+        :name="senderName(m.from)"
+        :text="[m.text]"
+        :sent="m.from === auth.uid"
+        text-color="white"
+        :bg-color="m.from === auth.uid ? 'primary' : 'secondary'"
+      />
     </div>
     <div class="row q-gutter-sm q-mt-sm">
       <q-form @submit.prevent="onSubmit" class="row q-gutter-sm">
@@ -28,6 +37,7 @@
 <script setup>
 import { ref, watch, nextTick } from "vue";
 import { useAuthStore } from "stores/authStore";
+import { QChatMessage } from "quasar";
 
 const props = defineProps({
   friend: { type: Object, default: null },
@@ -58,7 +68,7 @@ watch(
   () => props.friend,
   () => {
     text.value = "";
-  }
+  },
 );
 
 watch(
@@ -66,7 +76,7 @@ watch(
   () => {
     nextTick(scrollToBottom);
   },
-  { deep: true }
+  { deep: true },
 );
 
 defineExpose({ scrollToBottom });
