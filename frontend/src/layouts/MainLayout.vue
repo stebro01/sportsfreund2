@@ -13,6 +13,16 @@
         </q-toolbar-title>
 
         <div class="no-pointer-events">{{ store.env.APP_VERSION }}</div>
+        <q-space />
+        <div v-if="auth.uid" class="row items-center">
+          <span class="q-mr-xs">{{ auth.username }} ({{ auth.uid }})</span>
+          <q-icon
+            name="content_copy"
+            class="cursor-pointer"
+            data-testid="copy-btn"
+            @click="copyUid"
+          />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -51,6 +61,7 @@
 import EssentialLink from "components/EssentialLink.vue";
 import { useAppStore } from "stores/appStore";
 import { useErrorStore } from "stores/errorStore";
+import { useAuthStore } from "stores/authStore";
 
 export default {
   name: "MainLayout",
@@ -60,7 +71,8 @@ export default {
   setup() {
     const store = useAppStore();
     const errorStore = useErrorStore();
-    return { store, errorStore };
+    const auth = useAuthStore();
+    return { store, errorStore, auth };
   },
   mounted() {
     this.store.log("MainLayout.vue::mounted()");
@@ -77,6 +89,13 @@ export default {
       if (this.errorStore.apiStatus === "ok") return "green";
       if (this.errorStore.apiStatus === "error") return "red";
       return "grey";
+    },
+  },
+  methods: {
+    copyUid() {
+      if (this.auth.uid) {
+        navigator.clipboard.writeText(this.auth.uid);
+      }
     },
   },
 };
