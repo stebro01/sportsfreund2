@@ -10,12 +10,13 @@ installQuasarPlugin();
 describe("LoginPage", () => {
   let store;
   let wrapper;
+  let notifyMock;
 
   beforeEach(() => {
     const pinia = createPinia();
     setActivePinia(pinia);
     store = useAuthStore();
-    store.login = jest.fn();
+    store.login = jest.fn().mockResolvedValue();
     store.register = jest.fn();
     wrapper = shallowMount(LoginPage, {
       global: {
@@ -23,13 +24,30 @@ describe("LoginPage", () => {
         stubs: { "q-page": true, "q-input": true, "q-btn": true },
       },
     });
+    notifyMock = jest.fn();
+    wrapper.vm.$q.notify = notifyMock;
   });
 
-  it("calls login on doLogin", async () => {
+  it("shows success notify on login", async () => {
     wrapper.vm.username = "u";
     wrapper.vm.password = "p";
     await wrapper.vm.doLogin();
     expect(store.login).toHaveBeenCalledWith("u", "p");
+    expect(notifyMock).toHaveBeenCalledWith({
+      type: "positive",
+      message: "Login successful",
+    });
+  });
+
+  it("shows error notify on failed login", async () => {
+    store.login.mockRejectedValue(new Error("bad"));
+    wrapper.vm.username = "u";
+    wrapper.vm.password = "p";
+    await wrapper.vm.doLogin();
+    expect(notifyMock).toHaveBeenCalledWith({
+      type: "negative",
+      message: "bad",
+    });
   });
 
   it("calls register on doRegister", async () => {

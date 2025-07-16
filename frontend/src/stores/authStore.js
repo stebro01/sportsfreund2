@@ -9,17 +9,25 @@ export const useAuthStore = defineStore("auth", {
   actions: {
     async register(username, password) {
       const api = useApiStore();
-      const res = await api.post("/register", { username, password });
-      this.uid = res.data.uid;
-      this.username = username;
-      localStorage.setItem("uid", this.uid);
+      try {
+        const res = await api.post("/register", { username, password });
+        this.uid = res.data.uid;
+        this.username = username;
+        localStorage.setItem("uid", this.uid);
+      } catch (err) {
+        throw err;
+      }
     },
     async login(username, password) {
       const api = useApiStore();
-      const res = await api.post("/login", { username, password });
-      this.uid = res.data.uid;
-      this.username = username;
-      localStorage.setItem("uid", this.uid);
+      try {
+        const res = await api.post("/login", { username, password });
+        this.uid = res.data.uid;
+        this.username = username;
+        localStorage.setItem("uid", this.uid);
+      } catch (err) {
+        throw err;
+      }
     },
     autoLogin() {
       const id = localStorage.getItem("uid");

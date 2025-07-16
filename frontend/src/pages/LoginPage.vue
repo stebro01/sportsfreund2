@@ -11,14 +11,22 @@
 
 <script setup>
 import { ref } from "vue";
+import { useQuasar } from "quasar";
 import { useAuthStore } from "stores/authStore";
 
 const store = useAuthStore();
 const username = ref("");
 const password = ref("");
+const $q = useQuasar();
 
 const doLogin = async () => {
-  await store.login(username.value, password.value);
+  try {
+    await store.login(username.value, password.value);
+    $q.notify({ type: "positive", message: "Login successful" });
+  } catch (err) {
+    const msg = err.response?.data?.detail || err.message;
+    $q.notify({ type: "negative", message: msg });
+  }
 };
 
 const doRegister = async () => {
