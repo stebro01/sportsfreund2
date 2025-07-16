@@ -13,7 +13,7 @@ jest.mock("stores/apiStore", () => {
     getMock,
   };
 });
-import { postMock } from "stores/apiStore";
+import { postMock, getMock } from "stores/apiStore";
 
 describe("chatStore requests", () => {
   let store;
@@ -33,23 +33,40 @@ describe("chatStore requests", () => {
   });
 
   it("stores chat requests without duplicates", () => {
-    ws.onmessage({ data: JSON.stringify({ event: "chat_request", from: "u1" }) });
+    ws.onmessage({
+      data: JSON.stringify({ event: "chat_request", from: "u1" }),
+    });
     expect(store.requests).toEqual(["u1"]);
-    ws.onmessage({ data: JSON.stringify({ event: "chat_request", from: "u1" }) });
+    ws.onmessage({
+      data: JSON.stringify({ event: "chat_request", from: "u1" }),
+    });
     expect(store.requests).toEqual(["u1"]);
   });
 
   it("acceptRequest posts and clears entry", async () => {
     store.requests.push("u1");
     await store.acceptRequest("u1");
-    expect(postMock).toHaveBeenCalledWith("/friend/accept", { uid: "me", friend_uid: "u1" });
+    expect(postMock).toHaveBeenCalledWith("/friend/accept", {
+      uid: "me",
+      friend_uid: "u1",
+    });
     expect(store.requests).toEqual([]);
   });
 
   it("declineRequest posts and clears entry", async () => {
     store.requests.push("u2");
     await store.declineRequest("u2");
-    expect(postMock).toHaveBeenCalledWith("/friend/decline", { uid: "me", friend_uid: "u2" });
+    expect(postMock).toHaveBeenCalledWith("/friend/decline", {
+      uid: "me",
+      friend_uid: "u2",
+    });
     expect(store.requests).toEqual([]);
+  });
+
+  it("connect loads friend usernames", async () => {
+    getMock.mockResolvedValueOnce({ data: { friends: ["f1"], requests: [] } });
+    getMock.mockResolvedValueOnce({ data: { username: "Bob" } });
+    await store.connect();
+    expect(store.friends).toEqual([{ uid: "f1", name: "Bob" }]);
   });
 });
