@@ -14,13 +14,13 @@
 <script setup>
 import { ref } from "vue";
 import { useQuasar } from "quasar";
-import { useAuthStore } from "stores/authStore";
+import { useChatStore } from "stores/chatStore";
 
 const emit = defineEmits(["added"]);
 
 const uid = ref("");
 const $q = useQuasar();
-const auth = useAuthStore();
+const chat = useChatStore();
 
 async function handle(action) {
   if (!uid.value) return;
@@ -34,6 +34,6 @@ async function handle(action) {
   }
 }
 
-const sendRequest = () => handle(auth.sendFriendRequest);
-const acceptRequest = () => handle(auth.acceptFriend);
+const sendRequest = () => handle(chat.sendFriendRequest);
+const acceptRequest = () => handle(chat.acceptFriend);
 </script>
