@@ -39,6 +39,15 @@ def load_users():
     return _load_json(users_file(), {})
 
 
+def get_user(uid: str) -> dict:
+    """Return stored user with ``uid``."""
+    users = load_users()
+    user = users.get(uid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
 def save_users(data):
     """Persist user dictionary to disk."""
     _save_json(users_file(), data)

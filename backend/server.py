@@ -117,6 +117,13 @@ def login(payload: dict):
     raise HTTPException(status_code=401, detail='Invalid credentials')
 
 
+@app.get('/user/{uid}')
+def get_user(uid: str):
+    """Return stored user information."""
+    user = user_service.get_user(uid)
+    return user
+
+
 @app.put('/user/{uid}')
 def update_user(uid: str, payload: dict):
     """Modify an existing user."""

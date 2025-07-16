@@ -52,6 +52,7 @@ describe("MainLayout", () => {
   it("clears auth data on logout", async () => {
     store.username = "user";
     localStorage.setItem("uid", "abc");
+    localStorage.setItem("username", "user");
     const btn = wrapper.get('[data-testid="login-menu-btn"]');
     await btn.trigger("click");
     const logout = wrapper.get('[data-testid="logout-btn"]');
@@ -59,6 +60,7 @@ describe("MainLayout", () => {
     expect(store.uid).toBeNull();
     expect(store.username).toBe("");
     expect(localStorage.getItem("uid")).toBeNull();
+    expect(localStorage.getItem("username")).toBeNull();
   });
 
   it("shows server reachable tooltip when ping succeeds", async () => {
