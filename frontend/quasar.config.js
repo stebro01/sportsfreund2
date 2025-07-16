@@ -20,7 +20,7 @@ export default configure(function (ctx) {
 
     supportTS: false,
 
-    boot: ["pinia", "autologin", "axios", "logger", "firebase"],
+    boot: ["pinia", "autologin", "auth-guard", "axios", "logger", "firebase"],
 
     css: ["app.scss"],
 
