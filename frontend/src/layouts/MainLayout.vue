@@ -16,12 +16,28 @@
         <q-space />
         <div v-if="auth.uid" class="row items-center">
           <span class="q-mr-xs">{{ auth.username }} ({{ auth.uid }})</span>
-          <q-icon
-            name="content_copy"
-            class="cursor-pointer"
-            data-testid="copy-btn"
-            @click="copyUid"
-          />
+          <q-btn label="Logged in" size="sm" data-testid="login-menu-btn">
+            <q-menu>
+              <q-list>
+                <q-item
+                  clickable
+                  v-close-popup
+                  data-testid="copy-btn"
+                  @click="copyUid"
+                >
+                  <q-item-section>Copy UID</q-item-section>
+                </q-item>
+                <q-item
+                  clickable
+                  v-close-popup
+                  data-testid="logout-btn"
+                  @click="logout"
+                >
+                  <q-item-section>Logout</q-item-section>
+                </q-item>
+              </q-list>
+            </q-menu>
+          </q-btn>
         </div>
       </q-toolbar>
     </q-header>
@@ -37,19 +53,6 @@
           :key="link.title"
           :el="link"
         />
-        <q-item
-          v-if="auth.uid"
-          clickable
-          data-testid="logout-btn"
-          @click="logout"
-        >
-          <q-item-section avatar>
-            <q-icon name="logout" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Logout</q-item-label>
-          </q-item-section>
-        </q-item>
       </q-list>
       <div class="text-center q-pa-lg">
         <q-img

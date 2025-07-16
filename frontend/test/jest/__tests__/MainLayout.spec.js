@@ -42,9 +42,23 @@ describe("MainLayout", () => {
   });
 
   it("copies uid to clipboard", async () => {
-    const copy = wrapper.find('[data-testid="copy-btn"]');
+    const btn = wrapper.get('[data-testid="login-menu-btn"]');
+    await btn.trigger("click");
+    const copy = wrapper.get('[data-testid="copy-btn"]');
     await copy.trigger("click");
     expect(global.navigator.clipboard.writeText).toHaveBeenCalledWith("abc");
+  });
+
+  it("clears auth data on logout", async () => {
+    store.username = "user";
+    localStorage.setItem("uid", "abc");
+    const btn = wrapper.get('[data-testid="login-menu-btn"]');
+    await btn.trigger("click");
+    const logout = wrapper.get('[data-testid="logout-btn"]');
+    await logout.trigger("click");
+    expect(store.uid).toBeNull();
+    expect(store.username).toBe("");
+    expect(localStorage.getItem("uid")).toBeNull();
   });
 
   it("shows server reachable tooltip when ping succeeds", async () => {
