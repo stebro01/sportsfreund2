@@ -1,9 +1,13 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated class="bg-primary ">
+    <q-header elevated class="bg-primary">
       <q-toolbar>
-        <q-icon class="cursor-pointer" name="img:icons/favicon-96x96.png" size="sm"
-          @click="leftDrawerOpen = !leftDrawerOpen" />
+        <q-icon
+          class="cursor-pointer"
+          name="img:icons/favicon-96x96.png"
+          size="sm"
+          @click="leftDrawerOpen = !leftDrawerOpen"
+        />
         <q-toolbar-title class="text-center no-pointer-events">
           {{ store.env.APP_NAME }}
         </q-toolbar-title>
@@ -18,47 +22,62 @@
           Essential Links
         </q-item-label>
 
-        <EssentialLink v-for="link in essentialLinks" :key="link.title" :el="link" />
+        <EssentialLink
+          v-for="link in essentialLinks"
+          :key="link.title"
+          :el="link"
+        />
       </q-list>
       <div class="text-center q-pa-lg">
-        <q-img class="cursor-pointer" src="icons/favicon-128x128.png" width="100px"
-          @click="$router.push({ name: 'About' })" />
+        <q-img
+          class="cursor-pointer"
+          src="icons/favicon-128x128.png"
+          width="100px"
+          @click="$router.push({ name: 'About' })"
+        />
       </div>
     </q-drawer>
 
     <q-page-container>
-
       <router-view />
+      <q-page-sticky position="bottom-right" :offset="[18, 18]">
+        <q-icon name="circle" :color="apiColor" size="12px" />
+      </q-page-sticky>
     </q-page-container>
   </q-layout>
 </template>
 
-
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
-import { useAppStore } from 'stores/appStore'
+import EssentialLink from "components/EssentialLink.vue";
+import { useAppStore } from "stores/appStore";
+import { useErrorStore } from "stores/errorStore";
 
 export default {
-  name: 'MainLayout',
+  name: "MainLayout",
   components: {
-    EssentialLink
+    EssentialLink,
   },
-  setup () {
-    const store = useAppStore()
-    return { store }
+  setup() {
+    const store = useAppStore();
+    const errorStore = useErrorStore();
+    return { store, errorStore };
   },
   mounted() {
-    this.store.log('MainLayout.vue::mounted()')
+    this.store.log("MainLayout.vue::mounted()");
   },
   data() {
     return {
       toggleLeftDrawer: false,
       leftDrawerOpen: false,
-      essentialLinks: this.store.getEssentialLinks
-    }
+      essentialLinks: this.store.getEssentialLinks,
+    };
   },
   computed: {
-
-  }
-}
+    apiColor() {
+      if (this.errorStore.apiStatus === "ok") return "green";
+      if (this.errorStore.apiStatus === "error") return "red";
+      return "grey";
+    },
+  },
+};
 </script>

@@ -26,6 +26,8 @@ export const useAppStore = defineStore("app", {
           icon: "info",
           route: "ChangeLog",
         },
+        { titel: "Login", caption: "login", icon: "login", route: "Login" },
+        { titel: "Chat", caption: "chat", icon: "chat", route: "Chat" },
         { titel: "Impressum", caption: "", icon: "gavel", route: "Impressum" },
       ],
     };
