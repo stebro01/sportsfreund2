@@ -12,13 +12,13 @@
           {{ store.env.APP_NAME }}
         </q-toolbar-title>
 
-        <div class="no-pointer-events">{{ store.env.APP_VERSION }}</div>
+        <div class="no-pointer-events text-caption">{{ store.env.APP_VERSION }}</div>
         <q-space />
         <div v-if="auth.uid" class="row items-center">
-          <span class="q-mr-xs">{{ auth.username }} ({{ auth.uid }})</span>
-          <q-btn label="Logged in" size="sm" data-testid="login-menu-btn">
+          <q-btn  size="sm" data-testid="login-menu-btn" icon="person" fit flat>
             <q-menu>
-              <q-list>
+              <q-list class="text-white bg-dark" style="width: 200px">
+                <q-item-section avatar></q-item-section>
                 <q-item
                   clickable
                   v-close-popup
@@ -27,12 +27,22 @@
                 >
                   <q-item-section>Copy UID</q-item-section>
                 </q-item>
+                <q-item clickable v-close-popup @click="userProfile">
+                  <q-item-section avatar>
+                    <q-icon name="person" />
+                  </q-item-section>
+                  <q-item-section>Profile</q-item-section>
+                </q-item>
+                <q-separator />
                 <q-item
                   clickable
                   v-close-popup
                   data-testid="logout-btn"
                   @click="logout"
                 >
+                  <q-item-section avatar>
+                    <q-icon name="logout" />
+                  </q-item-section>
                   <q-item-section>Logout</q-item-section>
                 </q-item>
               </q-list>
@@ -131,6 +141,9 @@ export default {
       localStorage.removeItem("username");
       localStorage.removeItem("password");
       this.leftDrawerOpen = false;
+    },
+    userProfile() {
+      this.$router.push({name: 'UserStatus'});
     },
   },
 };

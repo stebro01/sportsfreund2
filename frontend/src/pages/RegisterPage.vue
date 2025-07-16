@@ -1,13 +1,15 @@
 <template>
-  <q-page class="row items-center justify-center">
+  <q-page class="column items-center justify-center">
     <div class="text-h5 q-mb-md">Register</div>
     <div class="column q-gutter-sm" style="width: 300px">
-      <q-input v-model="username" label="Username" />
-      <q-input v-model="password" type="password" label="Password" />
+      <q-input v-model="username" label="Username" input-class="text-white" label-color="grey-7" />
+      <q-input v-model="password" type="password" label="Password" input-class="text-white" label-color="grey-7" />
       <q-input
         v-model="passwordConfirm"
         type="password"
         label="Confirm Password"
+        input-class="text-white"
+        label-color="grey-7"
       />
       <q-btn label="Register" color="primary" @click="doRegister" />
       <q-btn

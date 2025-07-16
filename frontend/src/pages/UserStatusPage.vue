@@ -1,10 +1,10 @@
 <template>
-  <q-page class="row items-center justify-center">
+  <q-page class="column items-center justify-center">
     <div class="text-h5 q-mb-md">User Status</div>
     <div class="column q-gutter-sm" style="width: 300px">
-      <q-input v-model="username" label="Username" />
-      <q-input v-model.number="age" type="number" label="Age" />
-      <q-input v-model="password" type="password" label="New Password" />
+      <q-input v-model="username" label="Username" input-class="text-white" label-color="grey-7" />
+      <q-input v-model.number="age" type="number" label="Age" input-class="text-white" label-color="grey-7" />
+      <q-input v-model="password" type="password" label="New Password" input-class="text-white" label-color="grey-7" />
       <q-btn label="Save" color="primary" @click="save" />
       <q-btn label="Delete Account" color="negative" @click="remove" />
     </div>
