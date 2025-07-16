@@ -1,4 +1,5 @@
 import json
+import time
 from pathlib import Path
 from .user_service import appdata_dir, _load_json, _save_json
 
@@ -21,7 +22,9 @@ def room_id(uid1: str, uid2: str) -> str:
 
 def add_message(room: str, message: dict) -> None:
     data = load_messages()
-    data.setdefault(room, []).append(message)
+    entry = message.copy()
+    entry.setdefault("time", time.time())
+    data.setdefault(room, []).append(entry)
     save_messages(data)
 
 

@@ -43,6 +43,7 @@ def test_friend_request_accept(tmp_path):
     u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
     u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
     with client.websocket_connect(f'/ws/{u2}') as ws:
+        ws.receive_text()  # own status update
         client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
         data = json.loads(ws.receive_text())
         assert data['event'] == 'chat_request'
