@@ -11,6 +11,7 @@ describe("ChatPage", () => {
   let store;
   let wrapper;
   let wsMock;
+  let notifyMock;
 
   beforeEach(() => {
     const pinia = createPinia();
@@ -27,6 +28,8 @@ describe("ChatPage", () => {
         stubs: { "q-page": true, "q-input": true, "q-btn": true },
       },
     });
+    notifyMock = jest.fn();
+    wrapper.vm.$q.notify = notifyMock;
   });
 
   it("connect opens websocket and updates state", async () => {
@@ -45,8 +48,19 @@ describe("ChatPage", () => {
     wrapper.vm.text = "hello";
     wrapper.vm.send();
     expect(wsMock.send).toHaveBeenCalledWith(
-      JSON.stringify({ to: "you", message: "hello" })
+      JSON.stringify({ to: "you", message: "hello" }),
     );
     expect(wrapper.vm.text).toBe("");
+  });
+
+  it("shows error notify when api fails", async () => {
+    store.sendFriendRequest.mockRejectedValue(new Error("boom"));
+    wrapper.vm.friend = "you";
+    await wrapper.vm.connect();
+    expect(notifyMock).toHaveBeenCalledWith({
+      type: "negative",
+      message: "boom",
+    });
+    expect(global.WebSocket).not.toHaveBeenCalled();
   });
 });

@@ -23,9 +23,11 @@
 
 <script setup>
 import { ref } from "vue";
+import { useQuasar } from "quasar";
 import { useAuthStore } from "stores/authStore";
 
 const store = useAuthStore();
+const $q = useQuasar();
 const friend = ref("");
 const text = ref("");
 const messages = ref([]);
@@ -35,8 +37,15 @@ let ws;
 store.autoLogin();
 
 const connect = async () => {
-  await store.sendFriendRequest(friend.value);
-  await store.acceptFriend(friend.value);
+  try {
+    await store.sendFriendRequest(friend.value);
+    await store.acceptFriend(friend.value);
+  } catch (err) {
+    const msg = err.response?.data?.detail || err.message;
+    $q.notify({ type: "negative", message: msg });
+    return;
+  }
+
   ws = new WebSocket(`ws://localhost:8000/ws/${store.uid}`);
   ws.onmessage = (e) => {
     const data = JSON.parse(e.data);
@@ -48,6 +57,13 @@ const connect = async () => {
   };
   ws.onopen = () => {
     connected.value = true;
+  };
+  ws.onerror = () => {
+    $q.notify({ type: "negative", message: "WebSocket error" });
+  };
+  ws.onclose = (e) => {
+    connected.value = false;
+    $q.notify({ type: "negative", message: e.reason || "Connection closed" });
   };
 };
 
