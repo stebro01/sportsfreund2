@@ -32,6 +32,7 @@ export const useAppStore = defineStore("app", {
           icon: "info",
           route: "ChangeLog",
         },
+        { seperator: true }
       ];
       if (!auth.uid) {
         links.push({
@@ -46,12 +47,6 @@ export const useAppStore = defineStore("app", {
           caption: "chat",
           icon: "chat",
           route: "Chat",
-        });
-        links.push({
-          titel: "Status",
-          caption: "status",
-          icon: "person",
-          route: "UserStatus",
         });
       }
       return links;
