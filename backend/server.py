@@ -170,6 +170,15 @@ def friend_accept(payload: dict):
     return {'status': 'accepted'}
 
 
+@app.post('/friend/decline')
+def friend_decline(payload: dict):
+    uid = payload['uid']
+    friend_uid = payload['friend_uid']
+    friend_service.decline_request(uid, friend_uid)
+    log_event({'event': 'friend_decline', 'uid': uid, 'friend_uid': friend_uid})
+    return {'status': 'declined'}
+
+
 @app.get('/messages/{uid}/{friend_uid}')
 def get_messages(uid: str, friend_uid: str):
     room = message_service.room_id(uid, friend_uid)

@@ -26,3 +26,14 @@ def accept_request(uid: str, friend_uid: str) -> None:
         user.setdefault("friends", []).append(friend_uid)
         friend.setdefault("friends", []).append(uid)
     save_users(users)
+
+
+def decline_request(uid: str, friend_uid: str) -> None:
+    """Decline a friend request for ``uid`` from ``friend_uid``."""
+    users = load_users()
+    user = users.get(uid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if friend_uid in user.get("requests", []):
+        user["requests"].remove(friend_uid)
+    save_users(users)
