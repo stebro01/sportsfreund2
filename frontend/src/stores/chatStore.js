@@ -7,7 +7,7 @@ export const useChatStore = defineStore("chat", {
   state: () => ({
     ws: null,
     connected: false,
-    friends: [],
+    friends: [], // [{ uid, name, online }]
     requests: [],
     friend: "",
     histories: {},
@@ -17,7 +17,7 @@ export const useChatStore = defineStore("chat", {
     openSocket() {
       const auth = useAuthStore();
       this.ws = new WebSocket(`ws://localhost:8000/ws/${auth.uid}`);
-      this.ws.onmessage = (e) => {
+      this.ws.onmessage = async (e) => {
         const data = JSON.parse(e.data);
         if (data.event === "chat_request") {
           if (!this.requests.includes(data.from)) this.requests.push(data.from);
@@ -25,6 +25,31 @@ export const useChatStore = defineStore("chat", {
             type: "info",
             message: `Chat request from ${data.from}`,
           });
+          return;
+        }
+        if (data.event === "friend_accept") {
+          if (!this.friends.some((f) => f.uid === data.from)) {
+            const api = useApiStore();
+            try {
+              const res = await api.get(`/user/${data.from}`);
+              this.friends.push({
+                uid: data.from,
+                name: res.data.username,
+                online: true,
+              });
+            } catch (err) {
+              this.friends.push({
+                uid: data.from,
+                name: data.from,
+                online: true,
+              });
+            }
+          }
+          return;
+        }
+        if (data.event === "status_update") {
+          const f = this.friends.find((f) => f.uid === data.uid);
+          if (f) f.online = data.online;
           return;
         }
         const msg = { from: data.from, text: data.message, time: Date.now() };
@@ -61,9 +86,9 @@ export const useChatStore = defineStore("chat", {
             fids.map(async (uid) => {
               try {
                 const ures = await api.get(`/user/${uid}`);
-                return { uid, name: ures.data.username };
+                return { uid, name: ures.data.username, online: false };
               } catch (err) {
-                return { uid, name: uid };
+                return { uid, name: uid, online: false };
               }
             })
           );
@@ -101,9 +126,9 @@ export const useChatStore = defineStore("chat", {
         const api = useApiStore();
         try {
           const res = await api.get(`/user/${uid}`);
-          this.friends.push({ uid, name: res.data.username });
+          this.friends.push({ uid, name: res.data.username, online: false });
         } catch (err) {
-          this.friends.push({ uid, name: uid });
+          this.friends.push({ uid, name: uid, online: false });
         }
       }
     },

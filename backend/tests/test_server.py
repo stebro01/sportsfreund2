@@ -69,12 +69,45 @@ def test_friend_request_decline(tmp_path):
     assert u1 not in users[u2].get('friends', [])
 
 
+def test_status_updates(tmp_path):
+    client = setup_env(tmp_path)
+    u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
+    u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
+    with client.websocket_connect(f'/ws/{u1}') as ws1:
+        assert json.loads(ws1.receive_text())['uid'] == u1
+        with client.websocket_connect(f'/ws/{u2}') as ws2:
+            assert json.loads(ws2.receive_text())['uid'] == u2
+            data = json.loads(ws1.receive_text())
+            assert data['event'] == 'status_update'
+            assert data['uid'] == u2
+            assert data['online'] is True
+        data = json.loads(ws1.receive_text())
+        assert data['event'] == 'status_update'
+        assert data['uid'] == u2
+        assert data['online'] is False
+
+
+def test_friend_accept_notify(tmp_path):
+    client = setup_env(tmp_path)
+    u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
+    u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
+    with client.websocket_connect(f'/ws/{u1}') as ws:
+        ws.receive_text()  # own status update
+        client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
+        client.post('/friend/accept', json={'uid': u2, 'friend_uid': u1})
+        data = json.loads(ws.receive_text())
+        assert data['event'] == 'friend_accept'
+        assert data['from'] == u2
+
+
 def test_websocket_chat(tmp_path):
     client = setup_env(tmp_path)
     u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
     u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
     with client.websocket_connect(f'/ws/{u1}') as ws1:
         with client.websocket_connect(f'/ws/{u2}') as ws2:
+            ws2.receive_text()  # status update
+            ws1.receive_text()  # status update about u2
             ws1.send_json({'to': u2, 'message': 'hi'})
             data = json.loads(ws2.receive_text())
             assert data['from'] == u1

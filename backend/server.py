@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import uuid
+import asyncio
 from pathlib import Path
 from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -167,6 +168,13 @@ def friend_accept(payload: dict):
     friend_uid = payload['friend_uid']
     friend_service.accept_request(uid, friend_uid)
     log_event({'event': 'friend_accept', 'uid': uid, 'friend_uid': friend_uid})
+    if friend_uid in manager.active:
+        asyncio.run(
+            manager.send_personal(
+                friend_uid,
+                json.dumps({"event": "friend_accept", "from": uid}),
+            )
+        )
     return {'status': 'accepted'}
 
 
@@ -194,14 +202,21 @@ class ConnectionManager:
         await websocket.accept()
         self.active[uid] = websocket
         log_event({"event": "ws_connect", "uid": uid})
+        await self.broadcast_status(uid, True)
 
     def disconnect(self, uid: str):
         self.active.pop(uid, None)
         log_event({"event": "ws_disconnect", "uid": uid})
+        asyncio.create_task(self.broadcast_status(uid, False))
 
     async def send_personal(self, uid: str, message: str):
         if uid in self.active:
             await self.active[uid].send_text(message)
+
+    async def broadcast_status(self, uid: str, online: bool):
+        message = json.dumps({"event": "status_update", "uid": uid, "online": online})
+        for ws in list(self.active.values()):
+            await ws.send_text(message)
 
 
 manager = ConnectionManager()

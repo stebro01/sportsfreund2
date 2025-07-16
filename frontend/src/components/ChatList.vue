@@ -6,7 +6,32 @@
       label="Friend"
       input-class="text-white"
       label-color="grey-7"
-    />
+    >
+      <template #option="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section avatar>
+            <q-icon
+              name="circle"
+              :color="scope.opt.online ? 'positive' : 'grey-6'"
+              size="8px"
+            />
+          </q-item-section>
+          <q-item-section>{{ scope.opt.label }}</q-item-section>
+        </q-item>
+      </template>
+      <template #selected-item="scope">
+        <q-item v-bind="scope.itemProps">
+          <q-item-section avatar>
+            <q-icon
+              name="circle"
+              :color="scope.opt.online ? 'positive' : 'grey-6'"
+              size="8px"
+            />
+          </q-item-section>
+          <q-item-section>{{ scope.opt.label }}</q-item-section>
+        </q-item>
+      </template>
+    </q-select>
   </div>
 </template>
 
@@ -26,6 +51,6 @@ const model = computed({
 });
 
 const options = computed(() =>
-  props.friends.map((f) => ({ label: f.name, value: f.uid }))
+  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online }))
 );
 </script>
