@@ -60,7 +60,7 @@ export const useChatStore = defineStore("chat", {
         }
       }
     },
-    async loadHistory(fid) {
+    async fetchHistory(fid) {
       const auth = useAuthStore();
       const api = useApiStore();
       try {
@@ -70,6 +70,16 @@ export const useChatStore = defineStore("chat", {
       } catch (err) {
         this.histories[fid] = [];
       }
+    },
+    async sendFriendRequest(friend_uid) {
+      const auth = useAuthStore();
+      const api = useApiStore();
+      await api.post("/friend/request", { uid: auth.uid, friend_uid });
+    },
+    async acceptFriend(friend_uid) {
+      const auth = useAuthStore();
+      const api = useApiStore();
+      await api.post("/friend/accept", { uid: auth.uid, friend_uid });
     },
     send(msg) {
       const auth = useAuthStore();

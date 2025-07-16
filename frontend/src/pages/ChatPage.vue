@@ -28,7 +28,7 @@ onMounted(async () => {
 });
 
 watch(friend, (val) => {
-  if (val) chat.loadHistory(val);
+  if (val) chat.fetchHistory(val);
 });
 
 const send = (msg) => {
@@ -38,6 +38,6 @@ const send = (msg) => {
 const onInvite = async (uid) => {
   if (!friends.value.includes(uid)) friends.value.push(uid);
   friend.value = uid;
-  await chat.loadHistory(uid);
+  await chat.fetchHistory(uid);
 };
 </script>
