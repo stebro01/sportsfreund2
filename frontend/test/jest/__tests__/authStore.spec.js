@@ -2,11 +2,11 @@ import { beforeEach, describe, it, expect, jest } from "@jest/globals";
 import { createPinia, setActivePinia } from "pinia";
 import { useAuthStore } from "stores/authStore";
 
-jest.mock("boot/axios", () => ({
-  api: { post: jest.fn(() => Promise.resolve({ data: { uid: "123" } })) }
-}))
-import { api } from "boot/axios"
-const postMock = api.post
+jest.mock("stores/apiStore", () => {
+  const postMock = jest.fn(() => Promise.resolve({ data: { uid: "123" } }));
+  return { useApiStore: () => ({ post: postMock }), postMock };
+});
+import { postMock } from "stores/apiStore";
 
 describe("authStore", () => {
   let store;

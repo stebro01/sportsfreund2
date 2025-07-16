@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { api } from "boot/axios";
+import { useApiStore } from "stores/apiStore";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -8,12 +8,14 @@ export const useAuthStore = defineStore("auth", {
   }),
   actions: {
     async register(username, password) {
+      const api = useApiStore();
       const res = await api.post("/register", { username, password });
       this.uid = res.data.uid;
       this.username = username;
       localStorage.setItem("uid", this.uid);
     },
     async login(username, password) {
+      const api = useApiStore();
       const res = await api.post("/login", { username, password });
       this.uid = res.data.uid;
       this.username = username;
@@ -24,9 +26,11 @@ export const useAuthStore = defineStore("auth", {
       if (id) this.uid = id;
     },
     async sendFriendRequest(friend_uid) {
+      const api = useApiStore();
       await api.post("/friend/request", { uid: this.uid, friend_uid });
     },
     async acceptFriend(friend_uid) {
+      const api = useApiStore();
       await api.post("/friend/accept", { uid: this.uid, friend_uid });
     },
   },
