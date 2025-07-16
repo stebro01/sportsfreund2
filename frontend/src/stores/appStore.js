@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { useAuthStore } from "./authStore";
 
 export const useAppStore = defineStore("app", {
   state: () => {
@@ -16,7 +17,12 @@ export const useAppStore = defineStore("app", {
         quick_timer_start_value: 20, // in seconds
       },
       PINNED_TIMERS: pinnedTimers || [],
-      essentialLinks: [
+    };
+  },
+  getters: {
+    essentialLinks: () => {
+      const auth = useAuthStore();
+      const links = [
         { titel: "Home", caption: "zurück", icon: "home", route: "Index" },
         { seperator: true },
         { titel: "Über", caption: "about", icon: "info", route: "About" },
@@ -26,26 +32,30 @@ export const useAppStore = defineStore("app", {
           icon: "info",
           route: "ChangeLog",
         },
-        { titel: "Login", caption: "login", icon: "login", route: "Login" },
-        {
-          titel: "Register",
-          caption: "register",
-          icon: "person_add",
-          route: "Register",
-        },
-        { titel: "Chat", caption: "chat", icon: "chat", route: "Chat" },
-        {
+      ];
+      if (!auth.uid) {
+        links.push({
+          titel: "Login",
+          caption: "login",
+          icon: "login",
+          route: "Login",
+        });
+      } else {
+        links.push({
+          titel: "Chat",
+          caption: "chat",
+          icon: "chat",
+          route: "Chat",
+        });
+        links.push({
           titel: "Status",
           caption: "status",
           icon: "person",
           route: "UserStatus",
-        },
-        { titel: "Impressum", caption: "", icon: "gavel", route: "Impressum" },
-      ],
-    };
-  },
-  getters: {
-    getEssentialLinks: (state) => state.essentialLinks,
+        });
+      }
+      return links;
+    },
     env: () => ({
       APP_URL: process.env.APP_URL,
       APP_VERSION: process.env.APP_VERSION,
