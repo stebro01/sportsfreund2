@@ -51,7 +51,9 @@
     <q-page-container>
       <router-view />
       <q-page-sticky position="bottom-right" :offset="[18, 18]">
-        <q-icon name="circle" :color="apiColor" size="12px" />
+        <q-icon name="circle" :color="apiColor" size="12px">
+          <q-tooltip>{{ apiTooltip }}</q-tooltip>
+        </q-icon>
       </q-page-sticky>
     </q-page-container>
   </q-layout>
@@ -62,6 +64,7 @@ import EssentialLink from "components/EssentialLink.vue";
 import { useAppStore } from "stores/appStore";
 import { useErrorStore } from "stores/errorStore";
 import { useAuthStore } from "stores/authStore";
+import { useApiStore } from "stores/apiStore";
 
 export default {
   name: "MainLayout",
@@ -72,10 +75,12 @@ export default {
     const store = useAppStore();
     const errorStore = useErrorStore();
     const auth = useAuthStore();
-    return { store, errorStore, auth };
+    const apiStore = useApiStore();
+    return { store, errorStore, auth, apiStore };
   },
   mounted() {
     this.store.log("MainLayout.vue::mounted()");
+    this.apiStore.get("/ping").catch(() => {});
   },
   data() {
     return {
@@ -89,6 +94,10 @@ export default {
       if (this.errorStore.apiStatus === "ok") return "green";
       if (this.errorStore.apiStatus === "error") return "red";
       return "grey";
+    },
+    apiTooltip() {
+      if (this.errorStore.apiStatus === "ok") return "Server reachable";
+      return this.errorStore.lastError || "";
     },
   },
   methods: {
