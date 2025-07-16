@@ -1,5 +1,6 @@
 <template>
   <q-page class="row items-center justify-center">
+    <div class="text-h5 q-mb-md">Login</div>
     <div class="column q-gutter-sm" style="width: 300px">
       <q-input v-model="username" label="Username" />
       <q-input v-model="password" type="password" label="Password" />

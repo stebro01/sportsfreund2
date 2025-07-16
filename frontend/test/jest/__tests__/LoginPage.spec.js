@@ -21,7 +21,7 @@ describe("LoginPage", () => {
     wrapper = shallowMount(LoginPage, {
       global: {
         plugins: [pinia],
-        stubs: { "q-page": true, "q-input": true, "q-btn": true },
+        stubs: { "q-input": true, "q-btn": true },
       },
     });
     notifyMock = jest.fn();
@@ -55,5 +55,11 @@ describe("LoginPage", () => {
     wrapper.vm.password = "p";
     await wrapper.vm.doRegister();
     expect(store.register).toHaveBeenCalledWith("u", "p");
+  });
+
+  it("renders header", () => {
+    const header = wrapper.find(".text-h5");
+    expect(header.exists()).toBe(true);
+    expect(header.text()).toBe("Login");
   });
 });
