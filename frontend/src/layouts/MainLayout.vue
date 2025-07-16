@@ -37,6 +37,19 @@
           :key="link.title"
           :el="link"
         />
+        <q-item
+          v-if="auth.uid"
+          clickable
+          data-testid="logout-btn"
+          @click="logout"
+        >
+          <q-item-section avatar>
+            <q-icon name="logout" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Logout</q-item-label>
+          </q-item-section>
+        </q-item>
       </q-list>
       <div class="text-center q-pa-lg">
         <q-img
@@ -86,10 +99,12 @@ export default {
     return {
       toggleLeftDrawer: false,
       leftDrawerOpen: false,
-      essentialLinks: this.store.getEssentialLinks,
     };
   },
   computed: {
+    essentialLinks() {
+      return this.store.essentialLinks;
+    },
     apiColor() {
       if (this.errorStore.apiStatus === "ok") return "green";
       if (this.errorStore.apiStatus === "error") return "red";
@@ -105,6 +120,12 @@ export default {
       if (this.auth.uid) {
         navigator.clipboard.writeText(this.auth.uid);
       }
+    },
+    logout() {
+      this.auth.uid = null;
+      this.auth.username = "";
+      localStorage.removeItem("uid");
+      this.leftDrawerOpen = false;
     },
   },
 };
