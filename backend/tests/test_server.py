@@ -10,6 +10,12 @@ def setup_env(tmp_path):
     return TestClient(app)
 
 
+def test_ping(tmp_path):
+    client = setup_env(tmp_path)
+    r = client.get('/ping')
+    assert r.status_code == 200
+
+
 def test_register_login(tmp_path):
     client = setup_env(tmp_path)
     r = client.post('/register', json={'username': 'alice', 'password': 'x'})

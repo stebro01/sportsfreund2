@@ -10,6 +10,12 @@ from .services import friend_service, user_service
 
 app = FastAPI()
 
+
+@app.get("/ping")
+def ping():
+    """Health check endpoint."""
+    return {"status": "ok"}
+
 # Enable CORS for frontend requests
 app.add_middleware(
     CORSMiddleware,
