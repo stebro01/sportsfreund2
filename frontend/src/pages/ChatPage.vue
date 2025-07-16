@@ -8,14 +8,17 @@
       <div
         class="q-pa-sm"
         style="height: 200px; overflow: auto; border: 1px solid #ccc"
-      >
-        <div v-for="m in messages" :key="m.time">
+      > {{ messages }}
+        <div v-for="m in messages" :key="m.time" class="text-white">
+          <span class="text-bold">{{ m.from }}</span>: {{ m.text }}
           {{ m.from }}: {{ m.text }}
         </div>
       </div>
       <div class="row q-gutter-sm q-mt-sm">
-        <q-input v-model="text" label="Message" />
-        <q-btn label="Send" @click="send" />
+        <q-form @submit="send" class="row q-gutter-sm">
+          <q-input v-model="text" label="Message" input-class="text-white" label-color="grey-7" />
+          <q-btn icon="send" type="submit" color="primary" />
+        </q-form>
       </div>
     </div>
   </q-page>
