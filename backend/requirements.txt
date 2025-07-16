@@ -1,3 +1,4 @@
 fastapi
-uvicorn
-httpx
+uvicorn[standard]
+httpx>=0.24,<0.28
+websockets
