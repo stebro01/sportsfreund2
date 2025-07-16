@@ -1,6 +1,7 @@
 <template>
   <q-page class="column items-center q-pa-md">
     <chat-invite class="q-mb-md" @added="onInvite" />
+    <chat-requests class="q-mb-md" />
     <chat-list v-model="friend" :friends="friends" />
     <chat-window
       v-if="connected && friend"
@@ -17,6 +18,7 @@ import { onMounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "stores/chatStore";
 import ChatInvite from "components/ChatInvite.vue";
+import ChatRequests from "components/ChatRequests.vue";
 import ChatList from "components/ChatList.vue";
 import ChatWindow from "components/ChatWindow.vue";
 

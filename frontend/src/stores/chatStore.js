@@ -8,6 +8,7 @@ export const useChatStore = defineStore("chat", {
     ws: null,
     connected: false,
     friends: [],
+    requests: [],
     friend: "",
     histories: {},
     messages: [],
@@ -19,7 +20,7 @@ export const useChatStore = defineStore("chat", {
       this.ws.onmessage = (e) => {
         const data = JSON.parse(e.data);
         if (data.event === "chat_request") {
-          if (!this.friends.includes(data.from)) this.friends.push(data.from);
+          if (!this.requests.includes(data.from)) this.requests.push(data.from);
           Notify.create({
             type: "info",
             message: `Chat request from ${data.from}`,
@@ -55,6 +56,7 @@ export const useChatStore = defineStore("chat", {
         try {
           const res = await api.get(`/user/${auth.uid}`);
           this.friends = res.data.friends || [];
+          this.requests = res.data.requests || [];
         } catch (err) {
           // ignore
         }
@@ -80,6 +82,17 @@ export const useChatStore = defineStore("chat", {
       const auth = useAuthStore();
       const api = useApiStore();
       await api.post("/friend/accept", { uid: auth.uid, friend_uid });
+    },
+    async acceptRequest(uid) {
+      await this.acceptFriend(uid);
+      this.requests = this.requests.filter((r) => r !== uid);
+      if (!this.friends.includes(uid)) this.friends.push(uid);
+    },
+    async declineRequest(friend_uid) {
+      const auth = useAuthStore();
+      const api = useApiStore();
+      await api.post("/friend/decline", { uid: auth.uid, friend_uid });
+      this.requests = this.requests.filter((r) => r !== friend_uid);
     },
     send(msg) {
       const auth = useAuthStore();

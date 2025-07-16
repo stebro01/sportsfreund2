@@ -51,8 +51,22 @@ def test_friend_request_accept(tmp_path):
     assert u1 in users[u2]['requests']
     client.post('/friend/accept', json={'uid': u2, 'friend_uid': u1})
     users = json.load(open(tmp_path/'user.json'))
+    assert u1 not in users[u2]['requests']
     assert u1 in users[u2]['friends']
     assert u2 in users[u1]['friends']
+
+
+def test_friend_request_decline(tmp_path):
+    client = setup_env(tmp_path)
+    u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
+    u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
+    client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
+    users = json.load(open(tmp_path/'user.json'))
+    assert u1 in users[u2]['requests']
+    client.post('/friend/decline', json={'uid': u2, 'friend_uid': u1})
+    users = json.load(open(tmp_path/'user.json'))
+    assert u1 not in users[u2].get('requests', [])
+    assert u1 not in users[u2].get('friends', [])
 
 
 def test_websocket_chat(tmp_path):
