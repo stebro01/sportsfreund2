@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+from fastapi import HTTPException
 
 
 def appdata_dir() -> Path:
@@ -41,3 +42,23 @@ def load_users():
 def save_users(data):
     """Persist user dictionary to disk."""
     _save_json(users_file(), data)
+
+
+def update_user(uid: str, values: dict) -> None:
+    """Update ``uid`` with given ``values`` and save."""
+    users = load_users()
+    user = users.get(uid)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.update(values)
+    save_users(users)
+
+
+def delete_user(uid: str) -> None:
+    """Remove ``uid`` from stored users."""
+    users = load_users()
+    if uid not in users:
+        raise HTTPException(status_code=404, detail="User not found")
+    users.pop(uid)
+    save_users(users)
+

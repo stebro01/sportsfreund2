@@ -38,6 +38,11 @@ const routes = [
         name: "Chat",
         component: () => import("pages/ChatPage.vue"),
       },
+      {
+        path: "status",
+        name: "UserStatus",
+        component: () => import("pages/UserStatusPage.vue"),
+      },
     ],
   },
 
