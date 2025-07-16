@@ -1,5 +1,6 @@
 <template>
   <q-page class="row items-center justify-center">
+    <div class="text-h5 q-mb-md">User Status</div>
     <div class="column q-gutter-sm" style="width: 300px">
       <q-input v-model="username" label="Username" />
       <q-input v-model.number="age" type="number" label="Age" />

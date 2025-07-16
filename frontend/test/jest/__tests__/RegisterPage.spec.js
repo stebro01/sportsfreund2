@@ -25,7 +25,7 @@ describe("RegisterPage", () => {
     wrapper = shallowMount(RegisterPage, {
       global: {
         plugins: [pinia, router],
-        stubs: { "q-page": true, "q-input": true, "q-btn": true },
+        stubs: { "q-input": true, "q-btn": true },
       },
     });
     notifyMock = jest.fn();
@@ -55,5 +55,11 @@ describe("RegisterPage", () => {
     wrapper.vm.passwordConfirm = "p";
     await wrapper.vm.doRegister();
     expect(routerPush).toHaveBeenCalledWith({ name: "Login" });
+  });
+
+  it("renders header", () => {
+    const header = wrapper.find(".text-h5");
+    expect(header.exists()).toBe(true);
+    expect(header.text()).toBe("Register");
   });
 });
