@@ -2,6 +2,7 @@
   <div v-if="friend" class="q-mt-md">
     <div class="text-h6 text-white q-mb-sm">{{ friend.name }}</div>
     <div
+      ref="container"
       class="q-pa-sm"
       style="height: 200px; overflow: auto; border: 1px solid #ccc"
     >
@@ -25,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { useAuthStore } from "stores/authStore";
 
 const props = defineProps({
@@ -36,6 +37,11 @@ const props = defineProps({
 const emit = defineEmits(["send"]);
 
 const text = ref("");
+const container = ref(null);
+function scrollToBottom() {
+  const el = container.value;
+  if (el) el.scrollTop = el.scrollHeight;
+}
 const auth = useAuthStore();
 
 function senderName(uid) {
@@ -54,4 +60,14 @@ watch(
     text.value = "";
   }
 );
+
+watch(
+  () => props.messages,
+  () => {
+    nextTick(scrollToBottom);
+  },
+  { deep: true }
+);
+
+defineExpose({ scrollToBottom });
 </script>
