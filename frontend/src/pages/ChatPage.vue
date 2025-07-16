@@ -6,7 +6,7 @@
     <chat-window
       v-if="connected && friend"
       class="q-mt-md"
-      :friend="friend"
+      :friend="currentFriend"
       :messages="messages"
       @send="send"
     />
@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch } from "vue";
+import { onMounted, watch, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "stores/chatStore";
 import ChatInvite from "components/ChatInvite.vue";
@@ -24,6 +24,10 @@ import ChatWindow from "components/ChatWindow.vue";
 
 const chat = useChatStore();
 const { friend, friends, messages, connected } = storeToRefs(chat);
+
+const currentFriend = computed(() =>
+  friends.value.find((f) => f.uid === friend.value)
+);
 
 onMounted(async () => {
   await chat.connect();
@@ -38,7 +42,9 @@ const send = (msg) => {
 };
 
 const onInvite = async (uid) => {
-  if (!friends.value.includes(uid)) friends.value.push(uid);
+  if (!friends.value.some((f) => f.uid === uid)) {
+    friends.value.push({ uid, name: uid });
+  }
   friend.value = uid;
   await chat.fetchHistory(uid);
 };

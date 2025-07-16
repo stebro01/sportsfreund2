@@ -1,11 +1,12 @@
 <template>
   <div v-if="friend" class="q-mt-md">
+    <div class="text-h6 text-white q-mb-sm">{{ friend.name }}</div>
     <div
       class="q-pa-sm"
       style="height: 200px; overflow: auto; border: 1px solid #ccc"
     >
       <div v-for="m in messages" :key="m.time" class="text-white">
-        <span class="text-bold">{{ m.from }}</span
+        <span class="text-bold">{{ senderName(m.from) }}</span
         >: {{ m.text }}
       </div>
     </div>
@@ -25,15 +26,21 @@
 
 <script setup>
 import { ref, watch } from "vue";
+import { useAuthStore } from "stores/authStore";
 
 const props = defineProps({
-  friend: String,
+  friend: { type: Object, default: null },
   messages: { type: Array, default: () => [] },
 });
 
 const emit = defineEmits(["send"]);
 
 const text = ref("");
+const auth = useAuthStore();
+
+function senderName(uid) {
+  return uid === auth.uid ? auth.username || uid : props.friend?.name || uid;
+}
 
 const onSubmit = () => {
   if (!text.value) return;
@@ -45,6 +52,6 @@ watch(
   () => props.friend,
   () => {
     text.value = "";
-  },
+  }
 );
 </script>

@@ -55,8 +55,19 @@ export const useChatStore = defineStore("chat", {
         this.openSocket();
         try {
           const res = await api.get(`/user/${auth.uid}`);
-          this.friends = res.data.friends || [];
+          const fids = res.data.friends || [];
           this.requests = res.data.requests || [];
+          const infos = await Promise.all(
+            fids.map(async (uid) => {
+              try {
+                const ures = await api.get(`/user/${uid}`);
+                return { uid, name: ures.data.username };
+              } catch (err) {
+                return { uid, name: uid };
+              }
+            })
+          );
+          this.friends = infos;
         } catch (err) {
           // ignore
         }
@@ -86,7 +97,15 @@ export const useChatStore = defineStore("chat", {
     async acceptRequest(uid) {
       await this.acceptFriend(uid);
       this.requests = this.requests.filter((r) => r !== uid);
-      if (!this.friends.includes(uid)) this.friends.push(uid);
+      if (!this.friends.some((f) => f.uid === uid)) {
+        const api = useApiStore();
+        try {
+          const res = await api.get(`/user/${uid}`);
+          this.friends.push({ uid, name: res.data.username });
+        } catch (err) {
+          this.friends.push({ uid, name: uid });
+        }
+      }
     },
     async declineRequest(friend_uid) {
       const auth = useAuthStore();

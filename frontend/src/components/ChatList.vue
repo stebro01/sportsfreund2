@@ -2,8 +2,8 @@
   <div class="column q-gutter-sm items-center" style="max-width: 300px">
     <q-select
       v-model="model"
-      :options="friends"
-      label="Friend UID"
+      :options="options"
+      label="Friend"
       input-class="text-white"
       label-color="grey-7"
     />
@@ -24,4 +24,8 @@ const model = computed({
   get: () => props.modelValue,
   set: (val) => emit("update:modelValue", val),
 });
+
+const options = computed(() =>
+  props.friends.map((f) => ({ label: f.name, value: f.uid }))
+);
 </script>
