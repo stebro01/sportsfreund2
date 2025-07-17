@@ -1,5 +1,5 @@
 <template>
-  <q-page class="column items-center q-pa-md">
+  <q-page class="column items-center q-gutter-md q-pa-md">
     <chat-invite class="q-mb-md" @added="onInvite" />
     <chat-requests class="q-mb-md" />
     <chat-list v-model="friend" :friends="friends" />
@@ -26,7 +26,7 @@ const chat = useChatStore();
 const { friend, friends, messages, connected } = storeToRefs(chat);
 
 const currentFriend = computed(() =>
-  friends.value.find((f) => f.uid === friend.value)
+  friends.value.find((f) => f.uid === friend.value),
 );
 
 onMounted(async () => {

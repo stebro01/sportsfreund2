@@ -1,5 +1,5 @@
 <template>
-  <div v-if="friend" class="q-mt-md">
+  <div v-if="friend" class="chat-section q-mt-md">
     <div class="text-h6 text-white q-mb-sm">{{ friend.name }}</div>
     <div
       ref="container"
@@ -27,6 +27,7 @@
           label="Message"
           input-class="text-white"
           label-color="grey-7"
+          outlined
         />
         <q-btn icon="send" type="submit" color="primary" />
       </q-form>
