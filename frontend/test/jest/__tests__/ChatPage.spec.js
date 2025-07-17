@@ -42,16 +42,16 @@ describe("ChatPage", () => {
     wsMock.onopen();
     wrapper.vm.friend = "you";
     wsMock.onmessage({ data: JSON.stringify({ from: "you", message: "hi" }) });
-    expect(wrapper.vm.histories["you"][0].text).toBe("hi");
+    expect(store.histories["you"][0].text).toBe("hi");
   });
 
   it("send forwards message over websocket", async () => {
     wrapper.vm.friend = "you";
-    await wrapper.vm.connect();
+    await store.connect();
     wrapper.vm.text = "hello";
     wrapper.vm.send();
     expect(wsMock.send).toHaveBeenCalledWith(
-      JSON.stringify({ to: "you", message: "hello" })
+      JSON.stringify({ to: "you", message: "hello" }),
     );
     expect(wrapper.vm.text).toBe("");
   });
@@ -59,7 +59,7 @@ describe("ChatPage", () => {
   it("shows error notify when api fails", async () => {
     store.sendFriendRequest.mockRejectedValue(new Error("boom"));
     wrapper.vm.friend = "you";
-    await wrapper.vm.connect();
+    await store.connect();
     expect(notifyMock).toHaveBeenCalledWith({
       type: "negative",
       message: "boom",
