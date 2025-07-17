@@ -32,19 +32,21 @@ describe("chatStore requests", () => {
     store.openSocket();
   });
 
-  it("stores chat requests without duplicates", () => {
+  it("stores chat requests without duplicates", async () => {
     ws.onmessage({
       data: JSON.stringify({ event: "chat_request", from: "u1" }),
     });
-    expect(store.requests).toEqual(["u1"]);
+    await Promise.resolve();
+    expect(store.requests).toEqual([{ uid: "u1", name: "u1" }]);
     ws.onmessage({
       data: JSON.stringify({ event: "chat_request", from: "u1" }),
     });
-    expect(store.requests).toEqual(["u1"]);
+    await Promise.resolve();
+    expect(store.requests).toEqual([{ uid: "u1", name: "u1" }]);
   });
 
   it("acceptRequest posts and clears entry", async () => {
-    store.requests.push("u1");
+    store.requests.push({ uid: "u1", name: "U1" });
     await store.acceptRequest("u1");
     expect(postMock).toHaveBeenCalledWith("/friend/accept", {
       uid: "me",
@@ -54,7 +56,7 @@ describe("chatStore requests", () => {
   });
 
   it("declineFriend posts and clears entry", async () => {
-    store.requests.push("u2");
+    store.requests.push({ uid: "u2", name: "U2" });
     await store.declineFriend("u2");
     expect(postMock).toHaveBeenCalledWith("/friend/decline", {
       uid: "me",
@@ -74,6 +76,7 @@ describe("chatStore requests", () => {
 
   it("filters duplicate messages when fetching history", async () => {
     store.friend = "u1";
+    store.setChatPage(true);
     ws.onmessage({ data: JSON.stringify({ from: "u1", message: "hi" }) });
     const msgTime = store.messages[0].time;
     getMock.mockResolvedValueOnce({

@@ -1,13 +1,23 @@
 <template>
   <div v-if="requests.length" class="chat-section column q-gutter-sm">
     <div
-      v-for="uid in requests"
-      :key="uid"
+      v-for="req in requests"
+      :key="req.uid"
       class="row q-gutter-sm items-center"
     >
-      <span class="text-white">{{ uid }}</span>
-      <q-btn label="Accept" size="sm" color="primary" @click="accept(uid)" />
-      <q-btn label="Decline" size="sm" color="negative" @click="decline(uid)" />
+      <span class="text-white">{{ req.name }}</span>
+      <q-btn
+        label="Accept"
+        size="sm"
+        color="primary"
+        @click="accept(req.uid)"
+      />
+      <q-btn
+        label="Decline"
+        size="sm"
+        color="negative"
+        @click="decline(req.uid)"
+      />
     </div>
   </div>
 </template>

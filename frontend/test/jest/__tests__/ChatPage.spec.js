@@ -3,6 +3,7 @@ import { installQuasarPlugin } from "@quasar/quasar-app-extension-testing-unit-j
 import { shallowMount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import ChatPage from "pages/ChatPage.vue";
+import { useChatStore } from "stores/chatStore";
 import { useAuthStore } from "stores/authStore";
 
 installQuasarPlugin();
@@ -16,10 +17,12 @@ describe("ChatPage", () => {
   beforeEach(() => {
     const pinia = createPinia();
     setActivePinia(pinia);
-    store = useAuthStore();
+    store = useChatStore();
+    store.friend = "";
     store.sendFriendRequest = jest.fn();
     store.acceptFriend = jest.fn();
-    store.uid = "me";
+    const auth = useAuthStore();
+    auth.uid = "me";
     wsMock = { send: jest.fn() };
     global.WebSocket = jest.fn(() => wsMock);
     wrapper = shallowMount(ChatPage, {
@@ -49,20 +52,20 @@ describe("ChatPage", () => {
     wrapper.vm.friend = "you";
     await store.connect();
     wrapper.vm.text = "hello";
-    wrapper.vm.send();
+    wrapper.vm.send("hello");
     expect(wsMock.send).toHaveBeenCalledWith(
-      JSON.stringify({ to: "you", message: "hello" }),
+      JSON.stringify({ to: "you", message: "hello" })
     );
     expect(wrapper.vm.text).toBe("");
   });
 
   it("shows error notify when api fails", async () => {
-    store.sendFriendRequest.mockRejectedValue(new Error("boom"));
     wrapper.vm.friend = "you";
     await store.connect();
+    wsMock.onerror();
     expect(notifyMock).toHaveBeenCalledWith({
       type: "negative",
-      message: "boom",
+      message: "WebSocket error",
     });
   });
 });

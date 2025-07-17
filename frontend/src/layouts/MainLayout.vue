@@ -12,10 +12,15 @@
           {{ store.env.APP_NAME }}
         </q-toolbar-title>
 
-        <div class="no-pointer-events text-caption">{{ store.env.APP_VERSION }}</div>
+        <div class="no-pointer-events text-caption">
+          {{ store.env.APP_VERSION }}
+        </div>
         <q-space />
         <div v-if="auth.uid" class="row items-center">
-          <q-btn  size="sm" data-testid="login-menu-btn" icon="person" fit flat>
+          <q-btn size="sm" data-testid="login-menu-btn" icon="person" fit flat>
+            <q-badge v-if="chat.unread" color="red" floating>{{
+              chat.unread
+            }}</q-badge>
             <q-menu>
               <q-list class="text-white bg-dark" style="width: 200px">
                 <q-item-section avatar></q-item-section>
@@ -91,6 +96,9 @@ import { useAppStore } from "stores/appStore";
 import { useErrorStore } from "stores/errorStore";
 import { useAuthStore } from "stores/authStore";
 import { useApiStore } from "stores/apiStore";
+import { useChatStore } from "stores/chatStore";
+import { useRouter } from "vue-router";
+import { watch } from "vue";
 
 export default {
   name: "MainLayout",
@@ -102,7 +110,21 @@ export default {
     const errorStore = useErrorStore();
     const auth = useAuthStore();
     const apiStore = useApiStore();
-    return { store, errorStore, auth, apiStore };
+    const chat = useChatStore();
+    let router;
+    try {
+      router = useRouter();
+      watch(
+        () => router.currentRoute.value.name,
+        (name) => {
+          chat.setChatPage(name === "Chat");
+        },
+        { immediate: true }
+      );
+    } catch (err) {
+      // router not available (e.g., in unit tests)
+    }
+    return { store, errorStore, auth, apiStore, chat };
   },
   mounted() {
     this.store.log("MainLayout.vue::mounted()");
@@ -141,10 +163,10 @@ export default {
       localStorage.removeItem("username");
       localStorage.removeItem("password");
       this.leftDrawerOpen = false;
-      this.$router.push({name: 'Login'});
+      this.$router.push({ name: "Login" });
     },
     userProfile() {
-      this.$router.push({name: 'UserStatus'});
+      this.$router.push({ name: "UserStatus" });
     },
   },
 };
