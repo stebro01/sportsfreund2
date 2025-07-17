@@ -187,6 +187,15 @@ def friend_decline(payload: dict):
     return {'status': 'declined'}
 
 
+@app.post('/friend/remove')
+def friend_remove(payload: dict):
+    uid = payload['uid']
+    friend_uid = payload['friend_uid']
+    friend_service.remove_friend(uid, friend_uid)
+    log_event({'event': 'friend_remove', 'uid': uid, 'friend_uid': friend_uid})
+    return {'status': 'removed'}
+
+
 @app.get('/messages/{uid}/{friend_uid}')
 def get_messages(uid: str, friend_uid: str):
     room = message_service.room_id(uid, friend_uid)

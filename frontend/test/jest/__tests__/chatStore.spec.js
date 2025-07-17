@@ -67,7 +67,7 @@ describe("chatStore requests", () => {
     getMock.mockResolvedValueOnce({ data: { friends: ["f1"], requests: [] } });
     getMock.mockResolvedValueOnce({ data: { username: "Bob" } });
     await store.connect();
-    expect(store.friends).toEqual([{ uid: "f1", name: "Bob" }]);
+    expect(store.friends).toEqual([{ uid: "f1", name: "Bob", online: false }]);
   });
 
   it("filters duplicate messages when fetching history", async () => {
@@ -79,5 +79,17 @@ describe("chatStore requests", () => {
     });
     await store.fetchHistory("u1");
     expect(store.messages).toHaveLength(1);
+  });
+
+  it("removeFriend posts and updates state", async () => {
+    store.friends = [{ uid: "f1", name: "Bob" }];
+    store.friend = "f1";
+    await store.removeFriend("f1");
+    expect(postMock).toHaveBeenCalledWith("/friend/remove", {
+      uid: "me",
+      friend_uid: "f1",
+    });
+    expect(store.friends).toEqual([]);
+    expect(store.friend).toBe("");
   });
 });

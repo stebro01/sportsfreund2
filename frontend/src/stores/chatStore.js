@@ -96,7 +96,7 @@ export const useChatStore = defineStore("chat", {
               } catch (err) {
                 return { uid, name: uid, online: false };
               }
-            })
+            }),
           );
           this.friends = infos;
         } catch (err) {
@@ -164,6 +164,16 @@ export const useChatStore = defineStore("chat", {
     },
     async declineFriend(friend_uid) {
       await this.declineRequest(friend_uid);
+    },
+    async removeFriend(friend_uid) {
+      const auth = useAuthStore();
+      const api = useApiStore();
+      await api.post("/friend/remove", { uid: auth.uid, friend_uid });
+      this.friends = this.friends.filter((f) => f.uid !== friend_uid);
+      if (this.friend === friend_uid) {
+        this.friend = "";
+        this.messages = [];
+      }
     },
     send(msg) {
       const auth = useAuthStore();
