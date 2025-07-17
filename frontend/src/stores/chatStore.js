@@ -162,6 +162,9 @@ export const useChatStore = defineStore("chat", {
       await api.post("/friend/decline", { uid: auth.uid, friend_uid });
       this.requests = this.requests.filter((r) => r !== friend_uid);
     },
+    async declineFriend(friend_uid) {
+      await this.declineRequest(friend_uid);
+    },
     send(msg) {
       const auth = useAuthStore();
       if (!this.ws || !this.friend) return;
