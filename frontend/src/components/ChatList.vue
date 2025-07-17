@@ -36,11 +36,19 @@
         </q-item>
       </template>
     </q-select>
+    <q-btn
+      v-if="model"
+      label="Remove Friend"
+      size="sm"
+      color="negative"
+      @click="removeFriend"
+    />
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue";
+import { useChatStore } from "stores/chatStore";
 
 const props = defineProps({
   modelValue: String,
@@ -55,6 +63,11 @@ const model = computed({
 });
 
 const options = computed(() =>
-  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online }))
+  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online })),
 );
+
+const chat = useChatStore();
+const removeFriend = () => {
+  if (model.value) chat.removeFriend(model.value);
+};
 </script>

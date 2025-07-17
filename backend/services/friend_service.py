@@ -37,3 +37,17 @@ def decline_request(uid: str, friend_uid: str) -> None:
     if friend_uid in user.get("requests", []):
         user["requests"].remove(friend_uid)
     save_users(users)
+
+
+def remove_friend(uid: str, friend_uid: str) -> None:
+    """Remove ``friend_uid`` from ``uid``'s friend list and vice versa."""
+    users = load_users()
+    user = users.get(uid)
+    friend = users.get(friend_uid)
+    if not user or not friend:
+        raise HTTPException(status_code=404, detail="User not found")
+    if friend_uid in user.get("friends", []):
+        user["friends"].remove(friend_uid)
+    if uid in friend.get("friends", []):
+        friend["friends"].remove(uid)
+    save_users(users)

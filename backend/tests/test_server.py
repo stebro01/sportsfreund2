@@ -70,6 +70,20 @@ def test_friend_request_decline(tmp_path):
     assert u1 not in users[u2].get('friends', [])
 
 
+def test_friend_remove(tmp_path):
+    client = setup_env(tmp_path)
+    u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
+    u2 = client.post('/register', json={'username': 'b', 'password': 'p'}).json()['uid']
+    client.post('/friend/request', json={'uid': u1, 'friend_uid': u2})
+    client.post('/friend/accept', json={'uid': u2, 'friend_uid': u1})
+    users = json.load(open(tmp_path/'user.json'))
+    assert u1 in users[u2]['friends']
+    client.post('/friend/remove', json={'uid': u2, 'friend_uid': u1})
+    users = json.load(open(tmp_path/'user.json'))
+    assert u1 not in users[u2].get('friends', [])
+    assert u2 not in users[u1].get('friends', [])
+
+
 def test_status_updates(tmp_path):
     client = setup_env(tmp_path)
     u1 = client.post('/register', json={'username': 'a', 'password': 'p'}).json()['uid']
