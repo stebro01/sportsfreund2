@@ -1,5 +1,5 @@
 <template>
-  <div v-if="requests.length" class="column q-gutter-sm">
+  <div v-if="requests.length" class="chat-section column q-gutter-sm">
     <div
       v-for="uid in requests"
       :key="uid"

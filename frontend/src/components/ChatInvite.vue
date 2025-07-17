@@ -1,11 +1,11 @@
 <template>
-  <div class="row q-gutter-sm items-end">
-    <q-select
+  <div class="chat-section row q-gutter-sm items-end">
+    <q-input
       v-model="uid"
-      :options="options"
       label="Friend UID"
       input-class="text-white"
       label-color="grey-7"
+      outlined
     />
     <q-btn label="Send" color="primary" @click="sendRequest" />
     <q-btn label="Accept" color="primary" @click="acceptRequest" />
@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { useChatStore } from "stores/chatStore";
 
@@ -22,10 +22,6 @@ const emit = defineEmits(["added"]);
 const uid = ref("");
 const $q = useQuasar();
 const chat = useChatStore();
-
-const options = computed(() =>
-  chat.friends.map((f) => ({ label: f.name, value: f.uid }))
-);
 
 async function handle(action) {
   if (!uid.value) return;

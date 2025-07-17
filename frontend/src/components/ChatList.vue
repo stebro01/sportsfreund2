@@ -1,11 +1,13 @@
 <template>
-  <div class="column q-gutter-sm items-center" style="max-width: 300px">
+  <div class="chat-section column q-gutter-sm items-center">
     <q-select
       v-model="model"
       :options="options"
       label="Friend"
       input-class="text-white"
       label-color="grey-7"
+      dark
+      outlined
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -51,6 +53,6 @@ const model = computed({
 });
 
 const options = computed(() =>
-  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online }))
+  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online })),
 );
 </script>
