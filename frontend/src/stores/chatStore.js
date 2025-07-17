@@ -128,7 +128,7 @@ export const useChatStore = defineStore("chat", {
           }
         }
         this.histories[fid] = merged;
-        if (this.friend === fid) this.messages = merged;
+        if (this.friend === fid) this.messages = [...merged];
       } catch (err) {
         this.histories[fid] = [];
       }
