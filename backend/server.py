@@ -212,6 +212,16 @@ class ConnectionManager:
         self.active[uid] = websocket
         log_event({"event": "ws_connect", "uid": uid})
         await self.broadcast_status(uid, True)
+        # inform new connection about currently online users
+        for other_uid in self.active:
+            if other_uid != uid:
+                await websocket.send_text(
+                    json.dumps({
+                        "event": "status_update",
+                        "uid": other_uid,
+                        "online": True,
+                    })
+                )
 
     def disconnect(self, uid: str):
         self.active.pop(uid, None)

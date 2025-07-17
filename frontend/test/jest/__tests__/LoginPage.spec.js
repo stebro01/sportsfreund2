@@ -4,6 +4,7 @@ import { shallowMount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import LoginPage from "pages/LoginPage.vue";
 import { useAuthStore } from "stores/authStore";
+import { createRouter, createMemoryHistory } from "vue-router";
 
 installQuasarPlugin();
 
@@ -18,9 +19,11 @@ describe("LoginPage", () => {
     store = useAuthStore();
     store.login = jest.fn().mockResolvedValue();
     store.register = jest.fn();
+    const router = createRouter({ history: createMemoryHistory(), routes: [] });
+    router.push = jest.fn();
     wrapper = shallowMount(LoginPage, {
       global: {
-        plugins: [pinia],
+        plugins: [pinia, router],
         stubs: { "q-input": true, "q-btn": true },
       },
     });
@@ -54,7 +57,7 @@ describe("LoginPage", () => {
     wrapper.vm.username = "u";
     wrapper.vm.password = "p";
     await wrapper.vm.doRegister();
-    expect(store.register).toHaveBeenCalledWith("u", "p");
+    expect(wrapper.vm.$router.push).toHaveBeenCalledWith({ name: "Register" });
   });
 
   it("renders header", () => {
