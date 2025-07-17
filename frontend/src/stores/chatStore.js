@@ -28,16 +28,22 @@ export const useChatStore = defineStore("chat", {
           return;
         }
         if (data.event === "friend_accept") {
-          if (!this.friends.some((f) => f.uid === data.from)) {
-            const api = useApiStore();
-            try {
-              const res = await api.get(`/user/${data.from}`);
-              this.friends.push({
-                uid: data.from,
-                name: res.data.username,
-                online: true,
-              });
-            } catch (err) {
+          const api = useApiStore();
+          const existing = this.friends.find((f) => f.uid === data.from);
+          try {
+            const res = await api.get(`/user/${data.from}`);
+            const name = res.data.username;
+            if (existing) {
+              existing.name = name;
+              existing.online = true;
+            } else {
+              this.friends.push({ uid: data.from, name, online: true });
+            }
+          } catch (err) {
+            if (existing) {
+              existing.name = data.from;
+              existing.online = true;
+            } else {
               this.friends.push({
                 uid: data.from,
                 name: data.from,
