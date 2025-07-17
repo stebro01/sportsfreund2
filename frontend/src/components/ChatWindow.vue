@@ -20,18 +20,23 @@
         :bg-color="m.from === auth.uid ? 'primary' : 'secondary'"
       />
     </div>
-    <div class="row q-gutter-sm q-mt-sm">
       <q-form @submit.prevent="onSubmit" class="row q-gutter-sm">
+        <div class="row fit">
+          <div class="col">
         <q-input
           v-model="text"
           label="Message"
           input-class="text-white"
           label-color="grey-7"
           outlined
+          class="fit"
         />
-        <q-btn icon="send" type="submit" color="primary" />
+      </div>
+      <div class="col-1" style="width: 60px;">
+        <q-btn icon="send" type="submit" color="primary" class="fit" />
+      </div>
+      </div>
       </q-form>
-    </div>
   </div>
 </template>
 
