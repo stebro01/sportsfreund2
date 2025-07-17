@@ -53,9 +53,9 @@ describe("chatStore requests", () => {
     expect(store.requests).toEqual([]);
   });
 
-  it("declineRequest posts and clears entry", async () => {
+  it("declineFriend posts and clears entry", async () => {
     store.requests.push("u2");
-    await store.declineRequest("u2");
+    await store.declineFriend("u2");
     expect(postMock).toHaveBeenCalledWith("/friend/decline", {
       uid: "me",
       friend_uid: "u2",

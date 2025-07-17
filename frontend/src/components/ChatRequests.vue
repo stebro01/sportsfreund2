@@ -13,16 +13,16 @@
 </template>
 
 <script setup>
-import { storeToRefs } from 'pinia'
-import { useChatStore } from 'stores/chatStore'
+import { storeToRefs } from "pinia";
+import { useChatStore } from "stores/chatStore";
 
-const chat = useChatStore()
-const { requests } = storeToRefs(chat)
+const chat = useChatStore();
+const { requests } = storeToRefs(chat);
 
 const accept = (uid) => {
-  chat.acceptRequest(uid)
-}
+  chat.acceptRequest(uid);
+};
 const decline = (uid) => {
-  chat.declineRequest(uid)
-}
+  chat.declineFriend(uid);
+};
 </script>
