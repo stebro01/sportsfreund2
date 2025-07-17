@@ -16,15 +16,21 @@
 import { ref } from "vue";
 import { useQuasar } from "quasar";
 import { useChatStore } from "stores/chatStore";
+import { useAuthStore } from "stores/authStore";
 
 const emit = defineEmits(["added"]);
 
 const uid = ref("");
 const $q = useQuasar();
 const chat = useChatStore();
+const auth = useAuthStore();
 
 async function handle(action) {
   if (!uid.value) return;
+  if (uid.value === auth.uid) {
+    $q.notify({ type: "negative", message: "You cannot invite yourself" });
+    return;
+  }
   try {
     await action(uid.value);
     emit("added", uid.value);

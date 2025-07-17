@@ -48,6 +48,7 @@
 
 <script setup>
 import { computed } from "vue";
+import { useQuasar } from "quasar";
 import { useChatStore } from "stores/chatStore";
 
 const props = defineProps({
@@ -67,7 +68,16 @@ const options = computed(() =>
 );
 
 const chat = useChatStore();
+const $q = useQuasar();
 const removeFriend = () => {
-  if (model.value) chat.removeFriend(model.value);
+  if (!model.value) return;
+  $q.dialog({
+    title: "Remove Friend",
+    message: "Are you sure you want to remove this friend?",
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    chat.removeFriend(model.value);
+  });
 };
 </script>
