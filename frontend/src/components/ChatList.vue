@@ -8,6 +8,8 @@
       label-color="grey-7"
       dark
       outlined
+      emit-value
+      map-options
     >
       <template #option="scope">
         <q-item v-bind="scope.itemProps">
@@ -53,6 +55,6 @@ const model = computed({
 });
 
 const options = computed(() =>
-  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online })),
+  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online }))
 );
 </script>
