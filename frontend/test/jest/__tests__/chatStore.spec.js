@@ -67,7 +67,9 @@ describe("chatStore requests", () => {
     getMock.mockResolvedValueOnce({ data: { friends: ["f1"], requests: [] } });
     getMock.mockResolvedValueOnce({ data: { username: "Bob" } });
     await store.connect();
-    expect(store.friends).toEqual([{ uid: "f1", name: "Bob", online: false }]);
+    expect(store.friends).toEqual([
+      { uid: "f1", name: "Bob", online: false, pending: false },
+    ]);
   });
 
   it("filters duplicate messages when fetching history", async () => {

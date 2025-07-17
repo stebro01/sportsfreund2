@@ -42,9 +42,6 @@ const send = (msg) => {
 };
 
 const onInvite = async (uid) => {
-  if (!friends.value.some((f) => f.uid === uid)) {
-    friends.value.push({ uid, name: uid });
-  }
   friend.value = uid;
   await chat.fetchHistory(uid);
 };

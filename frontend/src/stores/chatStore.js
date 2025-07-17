@@ -7,7 +7,7 @@ export const useChatStore = defineStore("chat", {
   state: () => ({
     ws: null,
     connected: false,
-    friends: [], // [{ uid, name, online }]
+    friends: [], // [{ uid, name, online, pending }]
     requests: [],
     friend: "",
     histories: {},
@@ -36,18 +36,26 @@ export const useChatStore = defineStore("chat", {
             if (existing) {
               existing.name = name;
               existing.online = true;
+              existing.pending = false;
             } else {
-              this.friends.push({ uid: data.from, name, online: true });
+              this.friends.push({
+                uid: data.from,
+                name,
+                online: true,
+                pending: false,
+              });
             }
           } catch (err) {
             if (existing) {
               existing.name = data.from;
               existing.online = true;
+              existing.pending = false;
             } else {
               this.friends.push({
                 uid: data.from,
                 name: data.from,
                 online: true,
+                pending: false,
               });
             }
           }
@@ -98,9 +106,14 @@ export const useChatStore = defineStore("chat", {
             fids.map(async (uid) => {
               try {
                 const ures = await api.get(`/user/${uid}`);
-                return { uid, name: ures.data.username, online: false };
+                return {
+                  uid,
+                  name: ures.data.username,
+                  online: false,
+                  pending: false,
+                };
               } catch (err) {
-                return { uid, name: uid, online: false };
+                return { uid, name: uid, online: false, pending: false };
               }
             }),
           );
@@ -143,6 +156,25 @@ export const useChatStore = defineStore("chat", {
       const auth = useAuthStore();
       const api = useApiStore();
       await api.post("/friend/request", { uid: auth.uid, friend_uid });
+      let name = friend_uid;
+      try {
+        const res = await api.get(`/user/${friend_uid}`);
+        name = res.data.username;
+      } catch (err) {
+        // ignore
+      }
+      const existing = this.friends.find((f) => f.uid === friend_uid);
+      if (existing) {
+        existing.name = name;
+        existing.pending = true;
+      } else {
+        this.friends.push({
+          uid: friend_uid,
+          name,
+          online: false,
+          pending: true,
+        });
+      }
     },
     async acceptFriend(friend_uid) {
       const auth = useAuthStore();
@@ -156,9 +188,14 @@ export const useChatStore = defineStore("chat", {
         const api = useApiStore();
         try {
           const res = await api.get(`/user/${uid}`);
-          this.friends.push({ uid, name: res.data.username, online: false });
+          this.friends.push({
+            uid,
+            name: res.data.username,
+            online: false,
+            pending: false,
+          });
         } catch (err) {
-          this.friends.push({ uid, name: uid, online: false });
+          this.friends.push({ uid, name: uid, online: false, pending: false });
         }
       }
     },

@@ -64,7 +64,11 @@ const model = computed({
 });
 
 const options = computed(() =>
-  props.friends.map((f) => ({ label: f.name, value: f.uid, online: f.online })),
+  props.friends.map((f) => ({
+    label: f.pending ? `${f.name} (pending)` : f.name,
+    value: f.uid,
+    online: f.online,
+  })),
 );
 
 const chat = useChatStore();
